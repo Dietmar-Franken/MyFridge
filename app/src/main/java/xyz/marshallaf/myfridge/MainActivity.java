@@ -1,15 +1,25 @@
 package xyz.marshallaf.myfridge;
 
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ListView;
+
+import xyz.marshallaf.myfridge.data.FoodContract;
+import xyz.marshallaf.myfridge.data.FoodCursorAdapter;
+import xyz.marshallaf.myfridge.data.FoodDbHelper;
 
 public class MainActivity extends AppCompatActivity {
+
+    private FoodDbHelper mDbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +36,20 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+        
+        mDbHelper = new FoodDbHelper(this);
+
+        // set up the database
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+
+        // get a cursor of all the data
+        Cursor cursor = db.query(FoodContract.FoodEntry.TABLE_NAME, null, null, null, null, null, null);
+
+        // create the cursor adapter
+        FoodCursorAdapter adapter = new FoodCursorAdapter(this, cursor);
+
+        // assign the cursor to the listview
+        ((ListView) findViewById(R.id.list_view)).setAdapter(adapter);
     }
 
     @Override
@@ -46,7 +70,23 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             return true;
         }
+        if (id == R.id.action_dummy_data) {
+            // insert dummy data (for debugging)
+            insertDummyData();
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void insertDummyData() {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(FoodContract.FoodEntry.COLUMN_NAME, "Eggs");
+        values.put(FoodContract.FoodEntry.COLUMN_AMOUNT, 12);
+        values.put(FoodContract.FoodEntry.COLUMN_UNIT, FoodContract.FoodEntry.UNIT_ITEM);
+
+        db.insert(FoodContract.FoodEntry.TABLE_NAME, null, values);
     }
 }
