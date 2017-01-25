@@ -18,8 +18,7 @@ public final class FoodContract {
         // column names
         public static final String _ID = BaseColumns._ID;
         public static final String COLUMN_NAME = "name";
-        public static final String COLUMN_UNIT_TYPE = "unit_type";
-        public static final String COLUMN_UNIT_PREF = "unit_pref";
+        public static final String COLUMN_UNIT = "unit";
         public static final String COLUMN_AMOUNT = "amount";
         public static final String COLUMN_PRICE_PER = "priceper";
         public static final String COLUMN_STORE = "store";

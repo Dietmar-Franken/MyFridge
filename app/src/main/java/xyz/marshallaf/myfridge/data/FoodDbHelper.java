@@ -22,8 +22,7 @@ public class FoodDbHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + FoodEntry.TABLE_NAME + " (" +
             FoodEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             FoodEntry.COLUMN_NAME + " TEXT NOT NULL, " +
-            FoodEntry.COLUMN_UNIT_TYPE + " INTEGER NOT NULL, " +
-            FoodEntry.COLUMN_UNIT_PREF + " INTEGER NOT NULL, " +
+            FoodEntry.COLUMN_UNIT + " INTEGER NOT NULL, " +
             FoodEntry.COLUMN_AMOUNT + " REAL NOT NULL, " +
             FoodEntry.COLUMN_PRICE_PER + " REAL, " +
             FoodEntry.COLUMN_EXPIRATION + " INTEGER, " +
