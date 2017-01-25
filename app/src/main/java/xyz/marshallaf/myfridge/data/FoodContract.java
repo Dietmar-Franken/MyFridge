@@ -1,5 +1,6 @@
 package xyz.marshallaf.myfridge.data;
 
+import android.net.Uri;
 import android.provider.BaseColumns;
 
 /**
@@ -12,7 +13,18 @@ public final class FoodContract {
     // non-instantiable
     private FoodContract() {}
 
+    // base content uri
+    public static final String CONTENT_AUTHORITY = "xyz.marshallaf.myfridge";
+    public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
+
+    // uri path for food table
+    public static final String PATH_FOOD = "food";
+
     public static class FoodEntry implements BaseColumns {
+        // full content uri for food table
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_FOOD);
+
+        // database table name
         public static final String TABLE_NAME = "food";
 
         // column names
