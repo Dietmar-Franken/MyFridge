@@ -14,7 +14,6 @@ import android.view.View;
 import android.widget.ListView;
 
 import xyz.marshallaf.myfridge.data.FoodContract;
-import xyz.marshallaf.myfridge.data.FoodCursorAdapter;
 import xyz.marshallaf.myfridge.data.FoodDbHelper;
 
 public class MainActivity extends AppCompatActivity {

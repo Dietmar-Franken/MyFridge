@@ -1,4 +1,4 @@
-package xyz.marshallaf.myfridge.data;
+package xyz.marshallaf.myfridge;
 
 import android.content.Context;
 import android.database.Cursor;
