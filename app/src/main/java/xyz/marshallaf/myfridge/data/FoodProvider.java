@@ -115,7 +115,20 @@ public class FoodProvider extends ContentProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        return 0;
+        validateData(values, false);
+
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+        // match the uri
+        int match = sUriMatcher.match(uri);
+        switch (match) {
+            case FOOD_ID:
+                selection = ID_SELECTION;
+                selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
+                return db.update(FoodContract.FoodEntry.TABLE_NAME, values, selection, selectionArgs);
+            default:
+                throw new IllegalArgumentException("Invalid URI: " + uri);
+        }
     }
 
     /**
