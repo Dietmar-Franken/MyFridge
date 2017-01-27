@@ -18,6 +18,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <provider
+            android:authorities="xyz.marshallaf.myfridge"
+            android:name=".data.FoodProvider"
+            android:exported="false"/>
     </application>
 
 </manifest>
