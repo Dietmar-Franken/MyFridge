@@ -65,7 +65,13 @@ public class FoodProvider extends ContentProvider {
                 throw new IllegalArgumentException("Invalid URI: " + uri);
         }
 
-        return db.query(FoodContract.FoodEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+        Cursor cursor = db.query(FoodContract.FoodEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+
+        // set notification uri on the cursor, so we know what the cursor was created for
+        // if the data at this uri changes, then we know to update the cursor
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
+
+        return cursor;
     }
 
     @Nullable
@@ -110,7 +116,12 @@ public class FoodProvider extends ContentProvider {
                 throw new IllegalArgumentException("Invalid URI: " + uri);
         }
 
-        return db.delete(FoodContract.FoodEntry.TABLE_NAME, selection, selectionArgs);
+        int rowsAffected = db.delete(FoodContract.FoodEntry.TABLE_NAME, selection, selectionArgs);
+
+        // notify any listeners
+        if (rowsAffected > 0) getContext().getContentResolver().notifyChange(uri, null);
+
+        return rowsAffected;
     }
 
     @Override
@@ -125,10 +136,17 @@ public class FoodProvider extends ContentProvider {
             case FOOD_ID:
                 selection = ID_SELECTION;
                 selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
-                return db.update(FoodContract.FoodEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
             default:
                 throw new IllegalArgumentException("Invalid URI: " + uri);
         }
+
+        int rowsAffected = db.update(FoodContract.FoodEntry.TABLE_NAME, values, selection, selectionArgs);
+
+        // notify any listeners
+        if (rowsAffected > 0) getContext().getContentResolver().notifyChange(uri, null);
+
+        return rowsAffected;
     }
 
     /**
