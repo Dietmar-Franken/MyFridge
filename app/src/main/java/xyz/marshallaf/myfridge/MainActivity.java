@@ -2,10 +2,12 @@ package xyz.marshallaf.myfridge;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -16,9 +18,10 @@ import android.widget.ListView;
 import xyz.marshallaf.myfridge.data.FoodContract;
 import xyz.marshallaf.myfridge.data.FoodDbHelper;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private FoodDbHelper mDbHelper;
+    private FoodCursorAdapter mCursorAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,17 +41,14 @@ public class MainActivity extends AppCompatActivity {
         
         mDbHelper = new FoodDbHelper(this);
 
-        // set up the database
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-
-        // get a cursor of all the data
-        Cursor cursor = db.query(FoodContract.FoodEntry.TABLE_NAME, null, null, null, null, null, null);
-
         // create the cursor adapter
-        FoodCursorAdapter adapter = new FoodCursorAdapter(this, cursor);
+        mCursorAdapter = new FoodCursorAdapter(this, null);
 
         // assign the cursor to the listview
-        ((ListView) findViewById(R.id.list_view)).setAdapter(adapter);
+        ((ListView) findViewById(R.id.list_view)).setAdapter(mCursorAdapter);
+
+        // initialize the loader
+        getSupportLoaderManager().initLoader(0, null, this);
     }
 
     @Override
@@ -79,13 +79,33 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void insertDummyData() {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
         ContentValues values = new ContentValues();
         values.put(FoodContract.FoodEntry.COLUMN_NAME, "Eggs");
         values.put(FoodContract.FoodEntry.COLUMN_AMOUNT, 12);
         values.put(FoodContract.FoodEntry.COLUMN_UNIT, FoodContract.FoodEntry.UNIT_ITEM);
 
-        db.insert(FoodContract.FoodEntry.TABLE_NAME, null, values);
+        getContentResolver().insert(FoodContract.FoodEntry.CONTENT_URI, values);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String[] projection = new String[] {
+                FoodContract.FoodEntry._ID,
+                FoodContract.FoodEntry.COLUMN_NAME,
+                FoodContract.FoodEntry.COLUMN_AMOUNT,
+                FoodContract.FoodEntry.COLUMN_UNIT
+        };
+        return new CursorLoader(this, FoodContract.FoodEntry.CONTENT_URI, projection, null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mCursorAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        // remove reference to cursor
+        mCursorAdapter.swapCursor(null);
     }
 }
