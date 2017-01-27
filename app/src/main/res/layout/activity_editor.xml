@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".EditorActivity">
+
+    <EditText
+        android:id="@+id/edit_item_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        tools:text="Whole milk"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/edit_item_amount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            tools:text="1 gallon"/>
+
+        <Spinner
+            android:id="@+id/edit_item_unit"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:spinnerMode="dropdown"/>
+
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/edit_item_expiration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="31 Jan 2017"/>
+
+    <EditText
+        android:id="@+id/edit_item_store"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="Kroger"/>
+
+    <EditText
+        android:id="@+id/edit_item_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="$3.71"/>
+
+
+</LinearLayout>
