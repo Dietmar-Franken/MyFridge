@@ -92,7 +92,25 @@ public class FoodProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        return 0;
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+        // match the uri
+        int match = sUriMatcher.match(uri);
+        switch (match) {
+            case FOOD:
+                // delete all the entries
+                // we don't actually need to change anything here
+                break;
+            case FOOD_ID:
+                // delete a single entry
+                selection = ID_SELECTION;
+                selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid URI: " + uri);
+        }
+
+        return db.delete(FoodContract.FoodEntry.TABLE_NAME, selection, selectionArgs);
     }
 
     @Override
