@@ -1,5 +1,6 @@
 package xyz.marshallaf.myfridge;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -7,6 +8,8 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -46,6 +49,65 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mUnitSpinner = (Spinner) findViewById(R.id.edit_item_unit);
         
         setupSpinner();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_editor, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch(item.getItemId()) {
+            case R.id.editor_save:
+                saveItem();
+                finish();
+                return true;
+            case R.id.editor_delete:
+                // call for delete dialog here
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void saveItem() {
+        // get values from editor fields
+        String name = mNameTextView.getText().toString();
+        String store = mStoreTextView.getText().toString();
+        String priceString = mPriceTextView.getText().toString();
+        String amountString = mAmountTextView.getText().toString();
+        String expiration = mExpTextView.getText().toString();
+
+        // TODO: don't let user save unless required fields are filled in
+
+        // add values to object
+        ContentValues values = new ContentValues();
+        values.put(FoodContract.FoodEntry.COLUMN_NAME, name);
+        values.put(FoodContract.FoodEntry.COLUMN_UNIT, mUnit);
+
+        if (!TextUtils.isEmpty(expiration)) {
+            // TODO: change this to a date entry field and parse to integer
+            values.put(FoodContract.FoodEntry.COLUMN_EXPIRATION, 55556);
+        }
+
+        if (!TextUtils.isEmpty(store)) {
+            values.put(FoodContract.FoodEntry.COLUMN_STORE, store);
+        }
+
+        // convert numeric values and add to object
+        float amount = Float.parseFloat(amountString);
+        values.put(FoodContract.FoodEntry.COLUMN_AMOUNT, amount);
+
+        if (!TextUtils.isEmpty(priceString)) {
+            float price = Float.parseFloat(priceString);
+            values.put(FoodContract.FoodEntry.COLUMN_PRICE_PER, price);
+        }
+
+        // insert using contentresolver
+        getContentResolver().insert(FoodContract.FoodEntry.CONTENT_URI, values);
     }
 
     private void setupSpinner() {

@@ -5,13 +5,13 @@
     tools:context=".EditorActivity">
 
     <item
-        android:id="editor_save"
+        android:id="@+id/editor_save"
         android:title="Save"
         android:icon="@drawable/ic_check_white_24dp"
         app:showAsAction="always"/>
 
     <item
-        android:id="editor_delete"
+        android:id="@+id/editor_delete"
         android:title="Delete"
-        app:showAsAction="never"></item>
+        app:showAsAction="never"/>
 </menu>
