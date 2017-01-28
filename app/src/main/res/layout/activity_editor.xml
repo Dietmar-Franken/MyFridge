@@ -11,47 +11,98 @@
         android:id="@+id/edit_item_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="24sp"
-        tools:text="Whole milk"/>
+        android:hint="item name"
+        android:textSize="24sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <EditText
-            android:id="@+id/edit_item_amount"
+        <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
             android:layout_weight="1"
-            tools:text="1 gallon"/>
+            android:text="Amount" />
 
-        <Spinner
-            android:id="@+id/edit_item_unit"
+        <RelativeLayout
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:spinnerMode="dropdown"/>
+            android:layout_height="wrap_content"
+            android:layout_weight="2">
+
+            <EditText
+                android:id="@+id/edit_item_amount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:hint="number of"
+                android:inputType="number" />
+
+            <Spinner
+                android:id="@+id/edit_item_unit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:spinnerMode="dropdown" />
+        </RelativeLayout>
 
     </LinearLayout>
 
-    <EditText
-        android:id="@+id/edit_item_expiration"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="31 Jan 2017"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <EditText
-        android:id="@+id/edit_item_store"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="Kroger"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Expiration" />
 
-    <EditText
-        android:id="@+id/edit_item_price"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="$3.71"/>
+        <EditText
+            android:id="@+id/edit_item_expiration"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:hint="date" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Store" />
+
+        <EditText
+            android:id="@+id/edit_item_store"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:hint="purchased at" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Cost per" />
+
+        <EditText
+            android:id="@+id/edit_item_price"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:hint="price"
+            android:inputType="numberDecimal" />
+    </LinearLayout>
 
 
 </LinearLayout>
