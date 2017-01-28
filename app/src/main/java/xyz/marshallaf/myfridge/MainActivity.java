@@ -1,8 +1,10 @@
 package xyz.marshallaf.myfridge;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.LoaderManager;
@@ -13,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import xyz.marshallaf.myfridge.data.FoodContract;
@@ -45,7 +48,19 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mCursorAdapter = new FoodCursorAdapter(this, null);
 
         // assign the cursor to the listview
-        ((ListView) findViewById(R.id.list_view)).setAdapter(mCursorAdapter);
+        ListView foodList = (ListView) findViewById(R.id.list_view);
+        foodList.setAdapter(mCursorAdapter);
+
+        // set click listener for listview
+        foodList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long id) {
+                Uri uri = ContentUris.withAppendedId(FoodContract.FoodEntry.CONTENT_URI, id);
+                Intent intent = new Intent(MainActivity.this, EditorActivity.class);
+                intent.putExtra(FoodContract.FoodEntry.FOOD_URI_KEY, uri);
+                startActivity(intent);
+            }
+        });
 
         // initialize the loader
         getSupportLoaderManager().initLoader(0, null, this);

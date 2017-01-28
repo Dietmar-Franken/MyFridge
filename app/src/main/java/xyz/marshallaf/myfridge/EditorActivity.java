@@ -2,9 +2,11 @@ package xyz.marshallaf.myfridge;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -25,7 +27,9 @@ import xyz.marshallaf.myfridge.data.FoodContract;
  */
 
 public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
-    
+    // uri passed to intent when the activity started
+    Uri mUri;
+
     // member variables to easily access text fields
     EditText mNameTextView;
     EditText mAmountTextView;
@@ -39,6 +43,13 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
+
+        // check for a passed uri
+        Uri uri = getIntent().getParcelableExtra(FoodContract.FoodEntry.FOOD_URI_KEY);
+        if (uri != null) {
+            mUri = uri;
+            getSupportLoaderManager().initLoader(0, null, this);
+        }
         
         // get references to textviews to read data from
         mNameTextView = (EditText) findViewById(R.id.edit_item_name);
@@ -151,16 +162,38 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return null;
+        return new CursorLoader(this, mUri, null, null, null, null);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if (data.moveToFirst()) {
+            // get the data
+            String name = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_NAME));
+            String amount = String.valueOf(data.getFloat(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_AMOUNT)));
+            String store = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_STORE));
+            String expiration = String.valueOf(data.getInt(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_EXPIRATION)));
+            String price = String.valueOf(data.getFloat(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_PRICE_PER)));
 
+            // TODO: make sure there is something in the db for these fields before filling them so
+            // you don't end up with 0 in the fields with nothing.
+
+            // put the data in the layout
+            mNameTextView.setText(name);
+            mAmountTextView.setText(amount);
+            mStoreTextView.setText(store);
+            mExpTextView.setText(expiration);
+            mPriceTextView.setText(price);
+        }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
+        // null all the text views
+        mNameTextView.setText(null);
+        mAmountTextView.setText(null);
+        mStoreTextView.setText(null);
+        mExpTextView.setText(null);
+        mPriceTextView.setText(null);
     }
 }

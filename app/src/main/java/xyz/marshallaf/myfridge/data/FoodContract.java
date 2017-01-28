@@ -24,6 +24,9 @@ public final class FoodContract {
         // full content uri for food table
         public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_FOOD);
 
+        // key for parceling
+        public static final String FOOD_URI_KEY = "data_food_item";
+
         // database table name
         public static final String TABLE_NAME = "food";
 
