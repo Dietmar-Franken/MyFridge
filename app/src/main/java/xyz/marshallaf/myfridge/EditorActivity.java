@@ -24,6 +24,7 @@ import android.widget.Spinner;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import xyz.marshallaf.myfridge.data.FoodContract;
 import xyz.marshallaf.myfridge.data.FoodDbHelper;
@@ -35,7 +36,7 @@ import xyz.marshallaf.myfridge.data.UnitContract;
  * Created by Andrew Marshall on 1/26/2017.
  */
 
-public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, com.wdullaer.materialdatetimepicker.date.DatePickerDialog.OnDateSetListener {
     private final String LOG_TAG = EditorActivity.class.getName();
 
     // if editing, true, otherwise false
@@ -56,7 +57,10 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private ArrayList<EditText> mEditTexts;
     private Spinner mUnitSpinner;
     private int mUnit;
-    
+
+    // click listener for expiration field
+    View.OnClickListener mExpClickListener;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +82,24 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mEditTexts.add(mStoreTextView);
         mEditTexts.add(mPriceTextView);
         mEditTexts.add(mExpTextView);
-        
+
+        mExpClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Calendar now = Calendar.getInstance();
+                com.wdullaer.materialdatetimepicker.date.DatePickerDialog dpd =
+                        com.wdullaer.materialdatetimepicker.date.DatePickerDialog.newInstance(
+                                EditorActivity.this,
+                                now.get(Calendar.YEAR),
+                                now.get(Calendar.MONTH),
+                                now.get(Calendar.DAY_OF_MONTH)
+                        );
+                dpd.show(getFragmentManager(), "Datepickerdialog");
+            }
+        };
+
+        mExpTextView.setOnClickListener(mExpClickListener);
+
         setupSpinner();
 
         // check for a passed uri
@@ -191,6 +212,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             for (EditText view : mEditTexts) {
                 disableEditText(view);
             }
+            mExpTextView.setOnClickListener(mExpClickListener);
         } else {
             // all fields are inactive, make them active
             for (EditText view : mEditTexts) {
@@ -296,5 +318,11 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         for (EditText view : mEditTexts) {
             view.setText(null);
         }
+    }
+
+    @Override
+    public void onDateSet(com.wdullaer.materialdatetimepicker.date.DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
+        String date = (monthOfYear+1)+"/"+dayOfMonth+"/"+year;
+        mExpTextView.setText(date);
     }
 }
