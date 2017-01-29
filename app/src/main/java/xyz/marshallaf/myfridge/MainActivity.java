@@ -1,7 +1,6 @@
 package xyz.marshallaf.myfridge;
 
 import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -28,7 +27,6 @@ import android.widget.Toast;
 
 import xyz.marshallaf.myfridge.data.FoodContract;
 import xyz.marshallaf.myfridge.data.FoodDbHelper;
-import xyz.marshallaf.myfridge.data.UnitContract;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -100,15 +98,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private void insertDummyData() {
-        ContentValues values = new ContentValues();
-        values.put(FoodContract.FoodEntry.COLUMN_NAME, "Eggs");
-        values.put(FoodContract.FoodEntry.COLUMN_AMOUNT, 12);
-        values.put(FoodContract.FoodEntry.COLUMN_UNIT, UnitContract.UnitEntry.UNIT_ITEM);
-
-        getContentResolver().insert(FoodContract.FoodEntry.CONTENT_URI, values);
     }
 
     @Override
