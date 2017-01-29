@@ -1,6 +1,7 @@
 package xyz.marshallaf.myfridge;
 
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -94,10 +96,39 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 return true;
             case R.id.editor_delete:
                 // call for delete dialog here
+                showDeleteDialog();
                 return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showDeleteDialog() {
+        // build the dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Delete food item?");
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (dialogInterface != null) dialogInterface.dismiss();
+            }
+        });
+        builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                deleteItem();
+                finish();
+            }
+        });
+
+        // show the dialog
+        builder.show();
+    }
+
+    private void deleteItem() {
+        if (mUri != null) {
+            getContentResolver().delete(mUri, null, null);
+        }
     }
 
     private void saveItem() {
