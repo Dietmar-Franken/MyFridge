@@ -10,8 +10,6 @@ import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import xyz.marshallaf.myfridge.Utils;
-
 /**
  * Content provider for food database.
  *
@@ -105,7 +103,7 @@ public class FoodProvider extends ContentProvider {
                 values.containsKey(FoodContract.FoodEntry.COLUMN_AMOUNT)) {
             double amount = values.getAsDouble(FoodContract.FoodEntry.COLUMN_AMOUNT);
             int unit = values.getAsInteger(FoodContract.FoodEntry.COLUMN_UNIT);
-            values.put(FoodContract.FoodEntry.COLUMN_AMOUNT, Utils.convert(amount, unit, true));
+            values.put(FoodContract.FoodEntry.COLUMN_AMOUNT, 5);
         }
         return values;
     }

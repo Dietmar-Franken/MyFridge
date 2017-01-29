@@ -20,6 +20,7 @@ import android.widget.ListView;
 
 import xyz.marshallaf.myfridge.data.FoodContract;
 import xyz.marshallaf.myfridge.data.FoodDbHelper;
+import xyz.marshallaf.myfridge.data.UnitContract;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -97,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         ContentValues values = new ContentValues();
         values.put(FoodContract.FoodEntry.COLUMN_NAME, "Eggs");
         values.put(FoodContract.FoodEntry.COLUMN_AMOUNT, 12);
-        values.put(FoodContract.FoodEntry.COLUMN_UNIT, FoodContract.FoodEntry.UNIT_ITEM);
+        values.put(FoodContract.FoodEntry.COLUMN_UNIT, UnitContract.UnitEntry.UNIT_ITEM);
 
         getContentResolver().insert(FoodContract.FoodEntry.CONTENT_URI, values);
     }

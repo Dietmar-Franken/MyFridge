@@ -3,6 +3,7 @@ package xyz.marshallaf.myfridge;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -25,6 +26,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import xyz.marshallaf.myfridge.data.FoodContract;
+import xyz.marshallaf.myfridge.data.FoodDbHelper;
+import xyz.marshallaf.myfridge.data.UnitContract;
 
 /**
  * Activity to view and edit food entries.
@@ -202,6 +205,17 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     }
 
     private void setupSpinner() {
+        FoodDbHelper dbHelper = new FoodDbHelper(this);
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String[] columns = new String[] {UnitContract.UnitEntry.COLUMN_NAME};
+        Cursor cursor = db.query(UnitContract.UnitEntry.TABLE_NAME, columns, null, null, null, null, null);
+        final ArrayList<String> unitArray = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            unitArray.add(cursor.getString(cursor.getColumnIndex(UnitContract.UnitEntry.COLUMN_NAME)));
+        }
+        Log.d(LOG_TAG, "First three units: " + unitArray.get(0) + ", " + unitArray.get(1) + ", " + unitArray.get(2));
+
         // create array adapter for spinner
         ArrayAdapter unitSpinnerAdapter = ArrayAdapter.createFromResource(this, R.array.unitSpinner, android.R.layout.simple_spinner_item);
 
@@ -215,12 +229,15 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mUnitSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long l) {
+                // String stringUnit = getResources().getStringArray(R.array.unitSpinner)[position];
+                // mUnit = unitDb.getId(stringUnit);
                 mUnit = getResources().getIntArray(R.array.unitSpinnerValues)[position];
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
-                mUnit = FoodContract.FoodEntry.UNIT_ITEM;
+                // mUnit = unitDb.getId("item")
+                //mUnit = UnitContract.UnitEntry.UNIT_ITEM;
             }
         });
     }

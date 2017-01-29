@@ -34,9 +34,11 @@ public class FoodCursorAdapter extends CursorAdapter {
         int units = cursor.getInt(cursor.getColumnIndex(FoodEntry.COLUMN_UNIT));
         double amount = cursor.getDouble(cursor.getColumnIndex(FoodEntry.COLUMN_AMOUNT));
 
-        String unitString = mContext.getString(Utils.unitToString(units));
-
-        double amountConverted = Utils.convert(amount, units, false);
+//        String unitString = mContext.getString(Utils.unitToString(units));
+//
+//        double amountConverted = Utils.convert(amount, units, false);
+        String unitString = "chabby";
+        double amountConverted = 15;
 
         ((TextView) view.findViewById(R.id.food_item_name)).setText(foodName);
         ((TextView) view.findViewById(R.id.food_item_amount)).setText(String.valueOf(amountConverted) + " " + unitString);
