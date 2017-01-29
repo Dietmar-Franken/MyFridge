@@ -56,7 +56,10 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private EditText mExpTextView;
     private ArrayList<EditText> mEditTexts;
     private Spinner mUnitSpinner;
+
+    // storage variables for inputs to prevent data loss
     private int mUnit;
+    private long mExpDate;
 
     // click listener for expiration field
     View.OnClickListener mExpClickListener;
@@ -181,8 +184,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         values.put(FoodContract.FoodEntry.COLUMN_UNIT, mUnit);
 
         if (!TextUtils.isEmpty(expiration)) {
-            // TODO: change this to a date entry field and parse to integer
-            values.put(FoodContract.FoodEntry.COLUMN_EXPIRATION, 55556);
+            values.put(FoodContract.FoodEntry.COLUMN_EXPIRATION, mExpDate);
         }
 
         if (!TextUtils.isEmpty(store)) {
@@ -301,7 +303,10 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             // set expiration
             String expString = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_EXPIRATION));
             if (!TextUtils.isEmpty(expString)) {
-                mExpTextView.setText(expString);
+                Calendar now = Calendar.getInstance();
+                now.setTimeInMillis(Long.parseLong(expString));
+                String dateString = (now.get(Calendar.MONTH)+1) + "/" + now.get(Calendar.DAY_OF_MONTH) + "/" + now.get(Calendar.YEAR);
+                mExpTextView.setText(dateString);
             }
 
             // set price per
@@ -324,5 +329,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     public void onDateSet(com.wdullaer.materialdatetimepicker.date.DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
         String date = (monthOfYear+1)+"/"+dayOfMonth+"/"+year;
         mExpTextView.setText(date);
+        Calendar now = Calendar.getInstance();
+        now.set(year, monthOfYear, dayOfMonth);
+        mExpDate = now.getTimeInMillis();
     }
 }
