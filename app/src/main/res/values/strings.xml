@@ -18,4 +18,9 @@
     <string name="cup">cup</string>
     <string name="ounce">oz</string>
     <string name="pound">lb</string>
+
+    <!-- Strings for delete all confirmation -->
+    <string name="delete_all_dialog_title">Delete all items?</string>
+    <string name="delete_all_dialog_instruct">To confirm, type \"%1$s\" into the field below.</string>
+    <string name="confirm_delete_keyword">delete</string>
 </resources>

@@ -2,6 +2,7 @@ package xyz.marshallaf.myfridge;
 
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -10,13 +11,20 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import xyz.marshallaf.myfridge.data.FoodContract;
 import xyz.marshallaf.myfridge.data.FoodDbHelper;
@@ -85,9 +93,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         if (id == R.id.action_settings) {
             return true;
         }
-        if (id == R.id.action_dummy_data) {
-            // insert dummy data (for debugging)
-            insertDummyData();
+        if (id == R.id.action_delete_all_entries) {
+            // show confirmation for delete all entries
+            showDeleteDialog();
             return true;
         }
 
@@ -123,5 +131,64 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void onLoaderReset(Loader<Cursor> loader) {
         // remove reference to cursor
         mCursorAdapter.swapCursor(null);
+    }
+
+    private void showDeleteDialog() {
+        // get the view
+        View view = LayoutInflater.from(this).inflate(R.layout.delete_all_dialog, null);
+
+        // create alert dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(view);
+        ((TextView) view.findViewById(R.id.delete_all_dialog_instruct))
+                .setText(String.format(getString(R.string.delete_all_dialog_instruct), getString(R.string.confirm_delete_keyword)));
+        builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                deleteAllItems();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (dialogInterface != null) dialogInterface.dismiss();
+            }
+        });
+        final EditText input = (EditText) view.findViewById(R.id.delete_all_prompt_input);
+        final AlertDialog dialog = builder.create();
+
+        // show the dialog, with the delete button disabled
+        dialog.show();
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+        input.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                // nothing to do
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                // also nothing
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                // check if it contains the word "delete"
+                String entered = editable.toString().toLowerCase();
+                if (entered.equals(getString(R.string.confirm_delete_keyword)))
+                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                else
+                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+            }
+        });
+    }
+
+    private void deleteAllItems() {
+        int rowsAffected = getContentResolver().delete(FoodContract.FoodEntry.CONTENT_URI, null, null);
+        if (rowsAffected > 0) {
+            Toast.makeText(this, "All items deleted.", Toast.LENGTH_SHORT);
+        } else {
+            Toast.makeText(this, "Error deleting items. No changes made.", Toast.LENGTH_SHORT);
+        }
     }
 }
