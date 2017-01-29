@@ -23,7 +23,6 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import xyz.marshallaf.myfridge.data.FoodContract;
 import xyz.marshallaf.myfridge.data.FoodDbHelper;
@@ -214,7 +213,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         final SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
         String[] columns = new String[] {UnitContract.UnitEntry.COLUMN_NAME};
-        Cursor cursor = db.query(UnitContract.UnitEntry.TABLE_NAME, columns, null, null, null, null, null);
+        Cursor cursor = db.query(UnitContract.UnitEntry.TABLE_NAME, columns, null, null, null, null, UnitContract.UnitEntry._ID);
         final ArrayList<String> unitArray = new ArrayList<>();
         while (cursor.moveToNext()) {
             unitArray.add(cursor.getString(cursor.getColumnIndex(UnitContract.UnitEntry.COLUMN_NAME)));
@@ -234,6 +233,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mUnitSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long l) {
+                Log.d(LOG_TAG, "Position: " + position + ", ID: " + l);
                 mUnit = position;
             }
 
@@ -246,7 +246,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(this, mUri, null, null, null, null);
+        return new CursorLoader(this, mUri, null, null, null, UnitContract.UnitEntry._ID);
     }
 
     @Override
@@ -260,11 +260,10 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             String amount = String.valueOf(data.getFloat(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_AMOUNT)));
             mAmountTextView.setText(amount);
 
-            // set units TODO: make this better
+            // set units
             int unit = data.getInt(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_UNIT));
-            int position = Arrays.asList(getResources().getIntArray(R.array.unitSpinnerValues)).indexOf(unit);
-            Log.d(LOG_TAG, "Found position " + position);
-            mUnitSpinner.setSelection(position);
+            mUnit = unit;
+            mUnitSpinner.setSelection(mUnit);
 
             // set store
             String store = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_STORE));
