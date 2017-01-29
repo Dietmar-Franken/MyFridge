@@ -234,12 +234,12 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long l) {
                 Log.d(LOG_TAG, "Position: " + position + ", ID: " + l);
-                mUnit = position;
+                mUnit = position + 1;
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
-                mUnit = 0;
+                mUnit = 1;
             }
         });
     }
@@ -263,7 +263,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             // set units
             int unit = data.getInt(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_UNIT));
             mUnit = unit;
-            mUnitSpinner.setSelection(mUnit);
+            mUnitSpinner.setSelection(mUnit-1);
 
             // set store
             String store = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_STORE));
