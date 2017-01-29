@@ -18,6 +18,8 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import java.util.ArrayList;
+
 import xyz.marshallaf.myfridge.data.FoodContract;
 
 /**
@@ -27,30 +29,27 @@ import xyz.marshallaf.myfridge.data.FoodContract;
  */
 
 public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+    // if editing, true, otherwise false
+    private boolean isEditing = true;
+
     // uri passed to intent when the activity started
-    Uri mUri;
+    private Uri mUri;
 
     // member variables to easily access text fields
-    EditText mNameTextView;
-    EditText mAmountTextView;
-    EditText mStoreTextView;
-    EditText mPriceTextView;
-    EditText mExpTextView;
-    Spinner mUnitSpinner;
-    int mUnit;
+    private EditText mNameTextView;
+    private EditText mAmountTextView;
+    private EditText mStoreTextView;
+    private EditText mPriceTextView;
+    private EditText mExpTextView;
+    private ArrayList<EditText> mEditTexts;
+    private Spinner mUnitSpinner;
+    private int mUnit;
     
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
 
-        // check for a passed uri
-        Uri uri = getIntent().getParcelableExtra(FoodContract.FoodEntry.FOOD_URI_KEY);
-        if (uri != null) {
-            mUri = uri;
-            getSupportLoaderManager().initLoader(0, null, this);
-        }
-        
         // get references to textviews to read data from
         mNameTextView = (EditText) findViewById(R.id.edit_item_name);
         mAmountTextView = (EditText) findViewById(R.id.edit_item_amount);
@@ -58,8 +57,22 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mPriceTextView = (EditText) findViewById(R.id.edit_item_price);
         mExpTextView = (EditText) findViewById(R.id.edit_item_expiration);
         mUnitSpinner = (Spinner) findViewById(R.id.edit_item_unit);
+        mEditTexts = new ArrayList<>();
+        mEditTexts.add(mNameTextView);
+        mEditTexts.add(mAmountTextView);
+        mEditTexts.add(mStoreTextView);
+        mEditTexts.add(mPriceTextView);
+        mEditTexts.add(mExpTextView);
         
         setupSpinner();
+
+        // check for a passed uri
+        Uri uri = getIntent().getParcelableExtra(FoodContract.FoodEntry.FOOD_URI_KEY);
+        if (uri != null) {
+            toggleFields();
+            mUri = uri;
+            getSupportLoaderManager().initLoader(0, null, this);
+        }
     }
 
     @Override
@@ -75,6 +88,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             case R.id.editor_save:
                 saveItem();
                 finish();
+                return true;
+            case R.id.editor_edit:
+                toggleFields();
                 return true;
             case R.id.editor_delete:
                 // call for delete dialog here
@@ -119,6 +135,40 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
         // insert using contentresolver
         getContentResolver().insert(FoodContract.FoodEntry.CONTENT_URI, values);
+    }
+
+    private void toggleFields() {
+        if (isEditing) {
+            // all fields are active, make them inactive
+            for (EditText view : mEditTexts) {
+                disableEditText(view);
+            }
+        } else {
+            // all fields are inactive, make them active
+            for (EditText view : mEditTexts) {
+                enableEditText(view);
+            }
+        }
+        isEditing = !isEditing;
+    }
+
+    private void enableEditText(EditText view) {
+//        view.setFocusable(true);
+        view.setEnabled(true);
+//        view.setCursorVisible(true);
+//        view.setClickable(true);
+        // TODO: figure out what these are normally
+        //view.setKeyListener(null);
+        //view.setBackgroundColor(Color.TRANSPARENT);
+    }
+
+    private void disableEditText(EditText view) {
+//        view.setFocusable(false);
+        view.setEnabled(false);
+//        view.setCursorVisible(false);
+//        view.setClickable(false);
+        //view.setKeyListener(null);
+        //view.setBackgroundColor(Color.TRANSPARENT);
     }
 
     private void setupSpinner() {
@@ -190,10 +240,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         // null all the text views
-        mNameTextView.setText(null);
-        mAmountTextView.setText(null);
-        mStoreTextView.setText(null);
-        mExpTextView.setText(null);
-        mPriceTextView.setText(null);
+        for (EditText view : mEditTexts) {
+            view.setText(null);
+        }
     }
 }
