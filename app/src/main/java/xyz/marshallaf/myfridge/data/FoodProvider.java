@@ -103,7 +103,17 @@ public class FoodProvider extends ContentProvider {
                 values.containsKey(FoodContract.FoodEntry.COLUMN_AMOUNT)) {
             double amount = values.getAsDouble(FoodContract.FoodEntry.COLUMN_AMOUNT);
             int unit = values.getAsInteger(FoodContract.FoodEntry.COLUMN_UNIT);
-            values.put(FoodContract.FoodEntry.COLUMN_AMOUNT, 5);
+
+            // get conversion factor for unit in question
+            SQLiteDatabase db = mDbHelper.getReadableDatabase();
+            String[] columns = new String[] {UnitContract.UnitEntry.COLUMN_CONVERT};
+            String selection = UnitContract.UnitEntry._ID + "=?";
+            String[] selectionArgs = new String[] {String.valueOf(unit) };
+            Cursor c = db.query(UnitContract.UnitEntry.TABLE_NAME, columns, selection, selectionArgs, null, null, null);
+            c.moveToFirst();
+            double conversionFactor = c.getDouble(c.getColumnIndex(UnitContract.UnitEntry.COLUMN_CONVERT));
+
+            values.put(FoodContract.FoodEntry.COLUMN_AMOUNT, amount * conversionFactor);
         }
         return values;
     }
