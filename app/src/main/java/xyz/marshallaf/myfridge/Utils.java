@@ -88,4 +88,41 @@ public final class Utils {
             return amount / conversionFactor;
         }
     }
+
+    public static int unitToString(int unitCode) {
+        switch (unitCode) {
+            case FoodContract.FoodEntry.UNIT_ITEM:
+                return R.string.item;
+            case FoodContract.FoodEntry.UNIT_ML:
+                return R.string.milliliter;
+            case FoodContract.FoodEntry.UNIT_L:
+                return R.string.liter;
+            case FoodContract.FoodEntry.UNIT_FLOZ:
+                return R.string.fluid_oz;
+            case FoodContract.FoodEntry.UNIT_PINT:
+                return R.string.pint;
+            case FoodContract.FoodEntry.UNIT_QUART:
+                return R.string.quart;
+            case FoodContract.FoodEntry.UNIT_GALLON:
+                return R.string.gallon;
+            case FoodContract.FoodEntry.UNIT_TSP:
+                return R.string.teaspoon;
+            case FoodContract.FoodEntry.UNIT_TBSP:
+                return R.string.tablespoon;
+            case FoodContract.FoodEntry.UNIT_CUP:
+                return R.string.cup;
+            case FoodContract.FoodEntry.UNIT_GRAM:
+                return R.string.gram;
+            case FoodContract.FoodEntry.UNIT_KG:
+                return R.string.kilogram;
+            case FoodContract.FoodEntry.UNIT_MG:
+                return R.string.milligram;
+            case FoodContract.FoodEntry.UNIT_OZ:
+                return R.string.ounce;
+            case FoodContract.FoodEntry.UNIT_POUND:
+                return R.string.pound;
+            default:
+                return R.string.item;
+        }
+    }
 }

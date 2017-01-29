@@ -12,6 +12,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,6 +22,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import xyz.marshallaf.myfridge.data.FoodContract;
 
@@ -31,6 +33,8 @@ import xyz.marshallaf.myfridge.data.FoodContract;
  */
 
 public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+    private final String LOG_TAG = EditorActivity.class.getName();
+
     // if editing, true, otherwise false
     private boolean isEditing = true;
 
@@ -211,22 +215,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mUnitSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long l) {
-                String selection = (String) parent.getItemAtPosition(position);
-                if (!TextUtils.isEmpty(selection)) {
-                    switch (selection) {
-                        case "item":
-                            mUnit = FoodContract.FoodEntry.UNIT_ITEM;
-                            break;
-                        case "volume":
-                            mUnit = FoodContract.FoodEntry.UNIT_VOL;
-                            break;
-                        case "mass":
-                            mUnit = FoodContract.FoodEntry.UNIT_MASS;
-                            break;
-                        default:
-                            mUnit = FoodContract.FoodEntry.UNIT_ITEM;
-                    }
-                }
+                mUnit = getResources().getIntArray(R.array.unitSpinnerValues)[position];
             }
 
             @Override
@@ -244,22 +233,36 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data.moveToFirst()) {
-            // get the data
+            // set name
             String name = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_NAME));
-            String amount = String.valueOf(data.getFloat(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_AMOUNT)));
-            String store = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_STORE));
-            String expiration = String.valueOf(data.getInt(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_EXPIRATION)));
-            String price = String.valueOf(data.getFloat(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_PRICE_PER)));
-
-            // TODO: make sure there is something in the db for these fields before filling them so
-            // you don't end up with 0 in the fields with nothing.
-
-            // put the data in the layout
             mNameTextView.setText(name);
+
+            // set amount
+            String amount = String.valueOf(data.getFloat(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_AMOUNT)));
             mAmountTextView.setText(amount);
-            mStoreTextView.setText(store);
-            mExpTextView.setText(expiration);
-            mPriceTextView.setText(price);
+
+            // set units TODO: make this better
+            int unit = data.getInt(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_UNIT));
+            int position = Arrays.asList(getResources().getIntArray(R.array.unitSpinnerValues)).indexOf(unit);
+            Log.d(LOG_TAG, "Found position " + position);
+            mUnitSpinner.setSelection(position);
+
+            // set store
+            String store = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_STORE));
+            if (!TextUtils.isEmpty(store)) {
+                mStoreTextView.setText(store);
+            }
+            // set expiration
+            String expString = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_EXPIRATION));
+            if (!TextUtils.isEmpty(expString)) {
+                mExpTextView.setText(expString);
+            }
+
+            // set price per
+            String priceString = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_PRICE_PER));
+            if (!TextUtils.isEmpty(priceString)) {
+                mPriceTextView.setText(priceString);
+            }
         }
     }
 
