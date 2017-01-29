@@ -40,9 +40,27 @@ public final class FoodContract {
         public static final String COLUMN_EXPIRATION = "expiration";
         public static final String COLUMN_PHOTO = "photo";
 
-        // constants for unit
+        // constants for unit type
         public static final int UNIT_ITEM = 0;
-        public static final int UNIT_VOL = 1;
-        public static final int UNIT_MASS = 2;
+        public static final int UNIT_VOL = 2;
+        public static final int UNIT_MASS = 3;
+
+        // constants for specific unit
+        // volume
+        public static final int UNIT_ML = 200;
+        public static final int UNIT_L = 201;
+        public static final int UNIT_FLOZ = 202;
+        public static final int UNIT_PINT = 203;
+        public static final int UNIT_QUART = 204;
+        public static final int UNIT_GALLON = 205;
+        public static final int UNIT_TSP = 206;
+        public static final int UNIT_TBSP = 207;
+        public static final int UNIT_CUP = 208;
+        // mass
+        public static final int UNIT_GRAM = 300;
+        public static final int UNIT_MG = 301;
+        public static final int UNIT_KG = 302;
+        public static final int UNIT_OZ = 303;
+        public static final int UNIT_POUND = 304;
     }
 }
