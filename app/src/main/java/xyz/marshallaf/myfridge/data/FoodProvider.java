@@ -10,6 +10,8 @@ import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import xyz.marshallaf.myfridge.Utils;
+
 /**
  * Content provider for food database.
  *
@@ -80,6 +82,8 @@ public class FoodProvider extends ContentProvider {
         // validate the data
         validateData(values, true);
 
+        values = convertForStorage(values);
+
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
         // match the uri
@@ -94,6 +98,16 @@ public class FoodProvider extends ContentProvider {
             default:
                 throw new IllegalArgumentException("Invalid URI: " + uri);
         }
+    }
+
+    private ContentValues convertForStorage(ContentValues values) {
+        if (values.containsKey(FoodContract.FoodEntry.COLUMN_UNIT) &&
+                values.containsKey(FoodContract.FoodEntry.COLUMN_AMOUNT)) {
+            double amount = values.getAsDouble(FoodContract.FoodEntry.COLUMN_AMOUNT);
+            int unit = values.getAsInteger(FoodContract.FoodEntry.COLUMN_UNIT);
+            values.put(FoodContract.FoodEntry.COLUMN_AMOUNT, Utils.convert(amount, unit, true));
+        }
+        return values;
     }
 
     @Override
@@ -127,6 +141,8 @@ public class FoodProvider extends ContentProvider {
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         validateData(values, false);
+
+        values = convertForStorage(values);
 
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
