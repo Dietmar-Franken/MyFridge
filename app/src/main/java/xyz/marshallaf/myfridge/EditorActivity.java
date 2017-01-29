@@ -134,7 +134,11 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         }
 
         // insert using contentresolver
-        getContentResolver().insert(FoodContract.FoodEntry.CONTENT_URI, values);
+        if (mUri == null) {
+            getContentResolver().insert(FoodContract.FoodEntry.CONTENT_URI, values);
+        } else {
+            getContentResolver().update(mUri, values, null, null);
+        }
     }
 
     private void toggleFields() {
