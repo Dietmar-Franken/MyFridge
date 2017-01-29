@@ -153,22 +153,13 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     }
 
     private void enableEditText(EditText view) {
-//        view.setFocusable(true);
         view.setEnabled(true);
-//        view.setCursorVisible(true);
-//        view.setClickable(true);
-        // TODO: figure out what these are normally
-        //view.setKeyListener(null);
-        //view.setBackgroundColor(Color.TRANSPARENT);
     }
 
     private void disableEditText(EditText view) {
-//        view.setFocusable(false);
         view.setEnabled(false);
-//        view.setCursorVisible(false);
-//        view.setClickable(false);
-        //view.setKeyListener(null);
-        //view.setBackgroundColor(Color.TRANSPARENT);
+        view.setTextAppearance(this, R.style.EditTextDisabled);
+        //view.getBackground().setColorFilter(Color.argb(0, 0, 0, 0), PorterDuff.Mode.SRC_IN);
     }
 
     private void setupSpinner() {
