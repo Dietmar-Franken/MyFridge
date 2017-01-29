@@ -106,7 +106,7 @@ public class FoodProvider extends ContentProvider {
             double amount = values.getAsDouble(FoodContract.FoodEntry.COLUMN_AMOUNT);
             int unit = values.getAsInteger(FoodContract.FoodEntry.COLUMN_UNIT);
 
-            values.put(FoodContract.FoodEntry.COLUMN_AMOUNT, Utils.convert(amount, unit, true, mDbHelper));
+            values.put(FoodContract.FoodEntry.COLUMN_AMOUNT, Utils.convert(amount, unit, true, getContext()));
         }
         return values;
     }

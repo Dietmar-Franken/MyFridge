@@ -22,6 +22,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import xyz.marshallaf.myfridge.data.FoodContract;
@@ -263,8 +264,11 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
             // set amount
             double amount = data.getDouble(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_AMOUNT));
-            amount = Utils.convert(amount, mUnit, false, mDbHelper);
-            String amountString = String.valueOf(amount);
+            amount = Utils.convert(amount, mUnit, false, this);
+            // TODO: this will cause precision loss because to store it takes the text value from the field
+            // to fix: only update the amount if the user typed something here
+            BigDecimal amountBd = new BigDecimal(amount).setScale(2, BigDecimal.ROUND_HALF_UP);
+            String amountString = amountBd.toString();
             mAmountTextView.setText(amountString);
 
             // set store

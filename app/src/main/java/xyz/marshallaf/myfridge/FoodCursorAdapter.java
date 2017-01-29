@@ -2,6 +2,7 @@ package xyz.marshallaf.myfridge;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.icu.math.BigDecimal;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,13 +35,11 @@ public class FoodCursorAdapter extends CursorAdapter {
         int units = cursor.getInt(cursor.getColumnIndex(FoodEntry.COLUMN_UNIT));
         double amount = cursor.getDouble(cursor.getColumnIndex(FoodEntry.COLUMN_AMOUNT));
 
-//        String unitString = mContext.getString(Utils.unitToString(units));
-//
-//        double amountConverted = Utils.convert(amount, units, false);
-        String unitString = "chabby";
-        double amountConverted = 15;
+        String unitString = Utils.getUnitString(units, mContext);
+        double amountConverted = Utils.convert(amount, units, false, mContext);
+        java.math.BigDecimal amountRounded = new java.math.BigDecimal(amountConverted).setScale(2, BigDecimal.ROUND_HALF_UP);
 
         ((TextView) view.findViewById(R.id.food_item_name)).setText(foodName);
-        ((TextView) view.findViewById(R.id.food_item_amount)).setText(String.valueOf(amountConverted) + " " + unitString);
+        ((TextView) view.findViewById(R.id.food_item_amount)).setText(amountRounded.toString() + " " + unitString);
     }
 }
