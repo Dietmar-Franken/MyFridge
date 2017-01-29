@@ -1,38 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="unitSpinner">
-        <item>@string/item</item>
-        <item>@string/milligram</item>
-        <item>@string/gram</item>
-        <item>@string/kilogram</item>
-        <item>@string/ounce</item>
-        <item>@string/pound</item>
-        <item>@string/milliliter</item>
-        <item>@string/liter</item>
-        <item>@string/fluid_oz</item>
-        <item>@string/teaspoon</item>
-        <item>@string/tablespoon</item>
-        <item>@string/cup</item>
-        <item>@string/pint</item>
-        <item>@string/quart</item>
-        <item>@string/gallon</item>
-    </string-array>
 
-    <integer-array name="unitSpinnerValues">
-        <item>0</item>
-        <item>301</item>
-        <item>300</item>
-        <item>302</item>
-        <item>303</item>
-        <item>304</item>
-        <item>200</item>
-        <item>201</item>
-        <item>202</item>
-        <item>206</item>
-        <item>207</item>
-        <item>208</item>
-        <item>203</item>
-        <item>204</item>
-        <item>205</item>
-    </integer-array>
 </resources>
