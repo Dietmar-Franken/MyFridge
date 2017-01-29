@@ -256,14 +256,16 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             String name = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_NAME));
             mNameTextView.setText(name);
 
-            // set amount
-            String amount = String.valueOf(data.getFloat(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_AMOUNT)));
-            mAmountTextView.setText(amount);
-
             // set units
             int unit = data.getInt(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_UNIT));
             mUnit = unit;
             mUnitSpinner.setSelection(mUnit-1);
+
+            // set amount
+            double amount = data.getDouble(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_AMOUNT));
+            amount = Utils.convert(amount, mUnit, false, mDbHelper);
+            String amountString = String.valueOf(amount);
+            mAmountTextView.setText(amountString);
 
             // set store
             String store = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_STORE));
