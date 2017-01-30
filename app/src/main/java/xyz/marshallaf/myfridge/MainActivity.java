@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private FoodDbHelper mDbHelper;
     private FoodCursorAdapter mCursorAdapter;
+    private View mEmptyView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +58,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         // assign the cursor to the listview
         ListView foodList = (ListView) findViewById(R.id.list_view);
         foodList.setAdapter(mCursorAdapter);
+
+        // set empty view
+        mEmptyView = findViewById(R.id.empty_view);
+        foodList.setEmptyView(mEmptyView);
 
         // set click listener for listview
         foodList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -113,6 +118,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if (data.getCount() > 0) {
+            mEmptyView.setVisibility(View.GONE);
+        }
         mCursorAdapter.swapCursor(data);
     }
 
