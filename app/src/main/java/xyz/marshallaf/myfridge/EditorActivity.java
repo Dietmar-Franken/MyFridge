@@ -2,11 +2,15 @@ package xyz.marshallaf.myfridge;
 
 import android.content.ContentValues;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -20,6 +24,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 
 import java.math.BigDecimal;
@@ -56,13 +61,20 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private EditText mExpTextView;
     private ArrayList<EditText> mEditTexts;
     private Spinner mUnitSpinner;
+    private ImageView mPhotoView;
 
     // storage variables for inputs to prevent data loss
     private int mUnit;
     private long mExpDate;
 
     // click listener for expiration field
-    View.OnClickListener mExpClickListener;
+    private View.OnClickListener mExpClickListener;
+
+    // fab button
+    private FloatingActionButton mFabButton;
+
+    // image request code (arbitrary)
+    private static final int IMAGE_REQUEST_CODE = 1;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -79,6 +91,10 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mPriceTextView = (EditText) findViewById(R.id.edit_item_price);
         mExpTextView = (EditText) findViewById(R.id.edit_item_expiration);
         mUnitSpinner = (Spinner) findViewById(R.id.edit_item_unit);
+        mPhotoView = (ImageView) findViewById(R.id.edit_item_photo);
+
+        // add text fields to arraylist for easier handling
+        // TODO: this may be unnecessary or stupid, check it out
         mEditTexts = new ArrayList<>();
         mEditTexts.add(mNameTextView);
         mEditTexts.add(mAmountTextView);
@@ -102,6 +118,17 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         };
 
         mExpTextView.setOnClickListener(mExpClickListener);
+
+        mFabButton = (FloatingActionButton) findViewById(R.id.fab_add_photo);
+        mFabButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent pictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (pictureIntent.resolveActivity(getPackageManager()) != null) {
+                    startActivityForResult(pictureIntent, IMAGE_REQUEST_CODE);
+                }
+            }
+        });
 
         setupSpinner();
 
@@ -332,5 +359,14 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         Calendar now = Calendar.getInstance();
         now.set(year, monthOfYear, dayOfMonth);
         mExpDate = now.getTimeInMillis();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == IMAGE_REQUEST_CODE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            mPhotoView.setImageBitmap(imageBitmap);
+        }
     }
 }

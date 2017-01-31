@@ -122,6 +122,7 @@
                 android:text="Photo" />
 
             <ImageView
+                android:id="@+id/edit_item_photo"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
