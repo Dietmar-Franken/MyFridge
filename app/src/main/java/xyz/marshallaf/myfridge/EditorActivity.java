@@ -6,13 +6,16 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
+import android.support.v4.content.FileProvider;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -27,9 +30,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 import xyz.marshallaf.myfridge.data.FoodContract;
 import xyz.marshallaf.myfridge.data.FoodDbHelper;
@@ -66,6 +73,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     // storage variables for inputs to prevent data loss
     private int mUnit;
     private long mExpDate;
+    private String mPhotoPath;
 
     // click listener for expiration field
     private View.OnClickListener mExpClickListener;
@@ -123,9 +131,25 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mFabButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // start the photo intent
                 Intent pictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                // confirm that we have an app that can take photos
                 if (pictureIntent.resolveActivity(getPackageManager()) != null) {
-                    startActivityForResult(pictureIntent, IMAGE_REQUEST_CODE);
+                    // create the file where the photo will go
+                    File photoFile = null;
+                    try {
+                        photoFile = createImageFile();
+                    } catch (IOException e) {
+                        Log.e(LOG_TAG, "Error creating file for photo.", e);
+                    }
+                    // if we have the file
+                    if (photoFile != null) {
+                        // get the uri from the fileprovider
+                        Uri photoURI = FileProvider.getUriForFile(EditorActivity.this, "xyz.marshallaf.myfridge.fileprovider", photoFile);
+                        pictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                        // start the camera
+                        startActivityForResult(pictureIntent, IMAGE_REQUEST_CODE);
+                    }
                 }
             }
         });
@@ -216,6 +240,10 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
         if (!TextUtils.isEmpty(store)) {
             values.put(FoodContract.FoodEntry.COLUMN_STORE, store);
+        }
+
+        if (!TextUtils.isEmpty(mPhotoPath)) {
+            values.put(FoodContract.FoodEntry.COLUMN_PHOTO, mPhotoPath);
         }
 
         // convert numeric values and add to object
@@ -341,6 +369,13 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             if (!TextUtils.isEmpty(priceString)) {
                 mPriceTextView.setText(priceString);
             }
+
+            // set photo
+            String photoPath = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_PHOTO));
+            if (!TextUtils.isEmpty(photoPath)) {
+                Bitmap bitmap = BitmapFactory.decodeFile(photoPath);
+                mPhotoView.setImageBitmap(bitmap);
+            }
         }
     }
 
@@ -364,9 +399,22 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == IMAGE_REQUEST_CODE && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            mPhotoView.setImageBitmap(imageBitmap);
+            Bitmap bitmap = BitmapFactory.decodeFile(mPhotoPath);
+            mPhotoView.setImageBitmap(bitmap);
         }
+    }
+
+    private File createImageFile() throws IOException {
+        // create a unique file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "FOOD_" + timeStamp;
+
+        // set up the file with the picture directory
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File imageFile = File.createTempFile(imageFileName, ".jpg", storageDir);
+
+        // save the file
+        mPhotoPath = imageFile.getAbsolutePath();
+        return imageFile;
     }
 }
