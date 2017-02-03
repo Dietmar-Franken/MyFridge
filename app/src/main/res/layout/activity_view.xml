@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="194dp"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@android:color/black"
+                android:textSize="36sp"
+                android:layout_gravity="center_vertical"
+                tools:text="Whole milk"/>
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:orientation="horizontal"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/colorAccent"
+                android:fontFamily="sans-serif-regular"
+                android:textSize="18sp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="16dp"
+                android:text="Amount left"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/black"
+                android:fontFamily="sans-serif-medium"
+                android:textSize="18sp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="16dp"
+                tools:text="0.75 gal"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:orientation="horizontal"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/colorAccent"
+                android:fontFamily="sans-serif-regular"
+                android:textSize="18sp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="16dp"
+                android:text="Price"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/black"
+                android:fontFamily="sans-serif-medium"
+                android:textSize="18sp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="16dp"
+                tools:text="$2.89 / gal"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:orientation="horizontal"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/colorAccent"
+                android:fontFamily="sans-serif-regular"
+                android:textSize="18sp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="16dp"
+                android:text="Expires"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/black"
+                android:fontFamily="sans-serif-medium"
+                android:textSize="18sp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="16dp"
+                tools:text="02/17/2017"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
