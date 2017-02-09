@@ -326,7 +326,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(this, mUri, null, null, null, UnitContract.UnitEntry._ID);
+        return new CursorLoader(this, mUri, null, null, null, null);
     }
 
     @Override
