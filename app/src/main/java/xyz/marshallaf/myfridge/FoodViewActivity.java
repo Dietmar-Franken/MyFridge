@@ -151,7 +151,8 @@ public class FoodViewActivity extends AppCompatActivity implements LoaderManager
             // check and set price
             String priceString = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_PRICE_PER));
             if (!TextUtils.isEmpty(priceString)) {
-                ((TextView) findViewById(R.id.view_food_price)).setText(priceString);
+                String fullPriceString = "$" + priceString + " / " + unitString;
+                ((TextView) findViewById(R.id.view_food_price)).setText(fullPriceString);
             }
 
             // check and set image
