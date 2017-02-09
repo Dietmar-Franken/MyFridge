@@ -21,6 +21,11 @@ public final class UnitContract {
         public static final String COLUMN_CODE = "code";
         public static final String COLUMN_POSITION = "position";
 
+        // constants for unit types
+        public static final int UNIT_TYPE_ITEM = 0;
+        public static final int UNIT_TYPE_VOLUME = 1;
+        public static final int UNIT_TYPE_MASS = 2;
+
         // constants for specific unit
         public static final double UNIT_ITEM = 1;
         // volume conversions
