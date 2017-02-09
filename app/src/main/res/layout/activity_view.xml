@@ -17,6 +17,7 @@
             android:elevation="1dp"/>
 
         <ImageView
+            android:id="@+id/view_food_image"
             android:layout_width="match_parent"
             android:layout_height="360dp"
             android:scaleType="centerCrop"
@@ -39,6 +40,7 @@
             android:padding="16dp">
 
             <TextView
+                android:id="@+id/view_food_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
@@ -72,6 +74,7 @@
                     android:text="Amount left"/>
 
                 <TextView
+                    android:id="@+id/view_food_amount"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
@@ -114,6 +117,7 @@
                 android:text="Price"/>
 
             <TextView
+                android:id="@+id/view_food_price"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
@@ -144,6 +148,7 @@
                 android:text="Expires"/>
 
             <TextView
+                android:id="@+id/view_food_expires"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
