@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long id) {
                 Uri uri = ContentUris.withAppendedId(FoodContract.FoodEntry.CONTENT_URI, id);
-                Intent intent = new Intent(MainActivity.this, EditorActivity.class);
+                Intent intent = new Intent(MainActivity.this, FoodViewActivity.class);
                 intent.putExtra(FoodContract.FoodEntry.FOOD_URI_KEY, uri);
                 startActivity(intent);
             }
