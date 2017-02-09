@@ -1,7 +1,6 @@
 package xyz.marshallaf.myfridge;
 
 import android.content.ContentValues;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -17,7 +16,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.FileProvider;
 import android.support.v4.content.Loader;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -159,7 +157,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         // check for a passed uri
         Uri uri = getIntent().getParcelableExtra(FoodContract.FoodEntry.FOOD_URI_KEY);
         if (uri != null) {
-            toggleFields();
             mUri = uri;
             getSupportLoaderManager().initLoader(0, null, this);
         }
@@ -179,44 +176,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 saveItem();
                 finish();
                 return true;
-            case R.id.editor_edit:
-                toggleFields();
-                return true;
-            case R.id.editor_delete:
-                // call for delete dialog here
-                showDeleteDialog();
-                return true;
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private void showDeleteDialog() {
-        // build the dialog
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Delete food item?");
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                if (dialogInterface != null) dialogInterface.dismiss();
-            }
-        });
-        builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                deleteItem();
-                finish();
-            }
-        });
-
-        // show the dialog
-        builder.show();
-    }
-
-    private void deleteItem() {
-        if (mUri != null) {
-            getContentResolver().delete(mUri, null, null);
-        }
     }
 
     private void saveItem() {
@@ -261,32 +223,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         } else {
             getContentResolver().update(mUri, values, null, null);
         }
-    }
-
-    private void toggleFields() {
-        if (isEditing) {
-            // all fields are active, make them inactive
-            for (EditText view : mEditTexts) {
-                disableEditText(view);
-            }
-            mExpTextView.setOnClickListener(mExpClickListener);
-        } else {
-            // all fields are inactive, make them active
-            for (EditText view : mEditTexts) {
-                enableEditText(view);
-            }
-        }
-        isEditing = !isEditing;
-    }
-
-    private void enableEditText(EditText view) {
-        view.setEnabled(true);
-    }
-
-    private void disableEditText(EditText view) {
-        view.setEnabled(false);
-        view.setTextAppearance(this, R.style.EditTextDisabled);
-        //view.getBackground().setColorFilter(Color.argb(0, 0, 0, 0), PorterDuff.Mode.SRC_IN);
     }
 
     private void setupSpinner() {
