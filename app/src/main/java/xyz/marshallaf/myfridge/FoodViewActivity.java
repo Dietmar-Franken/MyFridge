@@ -1,6 +1,8 @@
 package xyz.marshallaf.myfridge;
 
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,6 +12,8 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.ViewOutlineProvider;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.math.BigDecimal;
@@ -87,6 +91,14 @@ public class FoodViewActivity extends AppCompatActivity implements LoaderManager
             String priceString = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_PRICE_PER));
             if (!TextUtils.isEmpty(priceString)) {
                 ((TextView) findViewById(R.id.view_food_price)).setText(priceString);
+            }
+
+            // check and set image
+            String photoPath = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_PHOTO));
+            if (!TextUtils.isEmpty(photoPath)) {
+                Bitmap bitmap = BitmapFactory.decodeFile(photoPath);
+                ((ImageView) findViewById(R.id.view_food_image)).setImageBitmap(bitmap);
+                (findViewById(R.id.view_text_layout)).setOutlineProvider(ViewOutlineProvider.BACKGROUND);
             }
         }
     }
