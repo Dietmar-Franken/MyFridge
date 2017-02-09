@@ -1,5 +1,7 @@
 package xyz.marshallaf.myfridge;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,9 +11,12 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.ViewOutlineProvider;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -48,6 +53,62 @@ public class FoodViewActivity extends AppCompatActivity implements LoaderManager
             // something has gone wrong, so just return to the food list
             Log.e(LOG_TAG, "No Uri passed to View Activity.");
             finish();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_view, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_edit:
+                // launch editor activity
+                Intent intent = new Intent(this, EditorActivity.class);
+                intent.putExtra(FoodContract.FoodEntry.FOOD_URI_KEY, mUri);
+                startActivity(intent);
+                return true;
+            case R.id.action_save:
+                // save amount to db
+
+                return true;
+            case R.id.action_delete:
+                // show delete prompt
+                showDeleteDialog();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void showDeleteDialog() {
+        // build the dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Delete food item?");
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (dialogInterface != null) dialogInterface.dismiss();
+            }
+        });
+        builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                deleteItem();
+                finish();
+            }
+        });
+
+        // show the dialog
+        builder.show();
+    }
+
+    private void deleteItem() {
+        if (mUri != null) {
+            getContentResolver().delete(mUri, null, null);
         }
     }
 
