@@ -39,7 +39,8 @@
         android:orientation="vertical"
         android:background="?android:colorBackground"
         android:elevation="6dp"
-        android:outlineProvider="none">
+        android:outlineProvider="none"
+        tools:outlineProvider="bounds">
 
         <FrameLayout
             android:layout_width="match_parent"
