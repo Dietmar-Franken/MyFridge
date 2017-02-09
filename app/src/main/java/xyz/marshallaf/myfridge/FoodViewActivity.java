@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -21,11 +23,14 @@ import android.view.ViewOutlineProvider;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Calendar;
 
 import xyz.marshallaf.myfridge.data.FoodContract;
 import xyz.marshallaf.myfridge.data.FoodDbHelper;
+
+import static android.R.attr.bitmap;
 
 /**
  * Created by Andrew Marshall on 2/8/2017.
@@ -158,7 +163,31 @@ public class FoodViewActivity extends AppCompatActivity implements LoaderManager
             // check and set image
             String photoPath = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_PHOTO));
             if (!TextUtils.isEmpty(photoPath)) {
+                // TODO: fix this so it decodes after knowing the size and orientation needed, I think via a stream
+                // decode image
                 Bitmap bitmap = BitmapFactory.decodeFile(photoPath);
+
+                // get image orientation
+                try {
+                    ExifInterface exif = new ExifInterface(photoPath);
+                    int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
+                    Matrix matrix = new Matrix();
+                    switch (orientation) {
+                        case 6:
+                            matrix.postRotate(90);
+                            break;
+                        case 3:
+                            matrix.postRotate(180);
+                            break;
+                        case 8:
+                            matrix.postRotate(270);
+                            break;
+                    }
+                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                } catch (IOException e) {
+                    Log.e(LOG_TAG, "problem loading image", e);
+                }
+
                 ((ImageView) findViewById(R.id.view_food_image)).setImageBitmap(bitmap);
                 (findViewById(R.id.view_text_layout)).setOutlineProvider(ViewOutlineProvider.BACKGROUND);
             }
