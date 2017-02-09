@@ -25,14 +25,21 @@
 
     </RelativeLayout>
 
-
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
+        android:paddingBottom="16dp"
+        android:clipToPadding="false">
+
+    <LinearLayout
+        android:id="@+id/view_text_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:background="?android:colorBackground"
-        android:elevation="8dp">
+        android:elevation="6dp"
+        android:outlineProvider="none">
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -161,6 +168,7 @@
         </LinearLayout>
 
     </LinearLayout>
+    </FrameLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
