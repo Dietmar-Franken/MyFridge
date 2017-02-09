@@ -26,30 +26,23 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="8dp"
                 android:layout_weight="1"
                 android:text="Amount" />
 
-            <RelativeLayout
+            <EditText
+                android:id="@+id/edit_item_amount"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="2">
+                android:layout_weight="1"
+                android:hint="number of"
+                android:inputType="number" />
 
-                <EditText
-                    android:id="@+id/edit_item_amount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:hint="number of"
-                    android:inputType="number" />
-
-                <Spinner
-                    android:id="@+id/edit_item_unit"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:spinnerMode="dropdown" />
-            </RelativeLayout>
+            <Spinner
+                android:id="@+id/edit_item_unit"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:spinnerMode="dialog" />
 
         </LinearLayout>
 
