@@ -95,6 +95,7 @@
             </LinearLayout>
 
         <View
+            android:id="@+id/view_action_change_unit"
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:background="@drawable/convert_button"

@@ -19,9 +19,11 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewOutlineProvider;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -59,6 +61,13 @@ public class FoodViewActivity extends AppCompatActivity implements LoaderManager
             Log.e(LOG_TAG, "No Uri passed to View Activity.");
             finish();
         }
+
+        findViewById(R.id.view_action_change_unit).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(FoodViewActivity.this, "change unit!", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -129,7 +138,6 @@ public class FoodViewActivity extends AppCompatActivity implements LoaderManager
             // set name
             ((TextView) findViewById(R.id.view_food_name)).setText(data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_NAME)));
 
-            // TODO: may want to have a Util function for getting the full string together
             // get unit code and string
             int unit = data.getInt(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_UNIT));
             String unitString = Utils.getUnitString(unit, this);
@@ -191,7 +199,13 @@ public class FoodViewActivity extends AppCompatActivity implements LoaderManager
                 ((ImageView) findViewById(R.id.view_food_image)).setImageBitmap(bitmap);
                 (findViewById(R.id.view_text_layout)).setOutlineProvider(ViewOutlineProvider.BACKGROUND);
             }
+
+            setupSpinner(unit);
         }
+    }
+
+    private void setupSpinner(int unit) {
+
     }
 
     @Override
