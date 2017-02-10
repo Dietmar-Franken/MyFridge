@@ -18,8 +18,7 @@ public final class UnitContract {
         public static final String _ID = BaseColumns._ID;
         public static final String COLUMN_NAME = "name";
         public static final String COLUMN_CONVERT = "conversion";
-        public static final String COLUMN_CODE = "code";
-        public static final String COLUMN_POSITION = "position";
+        public static final String COLUMN_TYPE = "type";
 
         // constants for unit types
         public static final int UNIT_TYPE_ITEM = 0;
