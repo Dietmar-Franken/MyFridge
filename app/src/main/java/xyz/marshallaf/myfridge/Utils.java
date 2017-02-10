@@ -52,4 +52,19 @@ public final class Utils {
         return unitString;
     }
 
+    public static int getUnitType(int unit, Context context) {
+        FoodDbHelper dbHelper = new FoodDbHelper(context);
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String[] columns = new String[] {UnitContract.UnitEntry.COLUMN_TYPE};
+        String selection = UnitContract.UnitEntry._ID + "=?";
+        String[] selectionArgs = new String[]{String.valueOf(unit)};
+        Cursor c = db.query(UnitContract.UnitEntry.TABLE_NAME, columns, selection, selectionArgs, null, null, null);
+        c.moveToFirst();
+        int unitType = c.getInt(c.getColumnIndex(UnitContract.UnitEntry.COLUMN_TYPE));
+
+        c.close();
+        db.close();
+
+        return unitType;
+    }
 }
