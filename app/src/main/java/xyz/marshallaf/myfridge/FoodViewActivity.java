@@ -25,7 +25,6 @@ import android.view.ViewOutlineProvider;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -49,13 +48,14 @@ public class FoodViewActivity extends AppCompatActivity implements LoaderManager
     private FoodDbHelper mDbHelper;
 
     private double mAbsoluteAmount;
+    private double mAbsolutePrice = -1;
+    private int mCurrentUnit;
+
     private ArrayList<String> mUnitNameArray;
-    private ArrayList<Integer> mUnitPosArray;
+    private ArrayList<Double> mUnitConversionArray;
 
     private TextView mPriceTextView;
     private TextView mAmountTextView;
-
-    private ListAdapter mUnitAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -73,6 +73,9 @@ public class FoodViewActivity extends AppCompatActivity implements LoaderManager
             finish();
         }
 
+        mAmountTextView = (TextView) findViewById(R.id.view_food_amount);
+        mPriceTextView = (TextView) findViewById(R.id.view_food_price);
+
         // get db helper
         mDbHelper = new FoodDbHelper(this);
 
@@ -85,15 +88,14 @@ public class FoodViewActivity extends AppCompatActivity implements LoaderManager
     }
 
     private void showUnitSpinner() {
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        Cursor cursor = db.query(UnitContract.UnitEntry.TABLE_NAME, null, null, null, null, null, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Convert to");
         String[] units = new String[mUnitNameArray.size()];
         builder.setItems(mUnitNameArray.toArray(units), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        Toast.makeText(FoodViewActivity.this, "You clicked on " + mUnitNameArray.get(i), Toast.LENGTH_LONG).show();
+                        mCurrentUnit = i;
+                        setAmountAndPrice();
                         dialogInterface.dismiss();
                     }
                 });
@@ -169,18 +171,18 @@ public class FoodViewActivity extends AppCompatActivity implements LoaderManager
             ((TextView) findViewById(R.id.view_food_name)).setText(data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_NAME)));
 
             // get unit code and string
-            int unit = data.getInt(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_UNIT));
-            String unitString = Utils.getUnitString(unit, this);
+            mCurrentUnit = data.getInt(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_UNIT));
 
             // get amount
             mAbsoluteAmount = data.getDouble(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_AMOUNT));
-            double amount = Utils.convert(mAbsoluteAmount, unit, false, this);
-            BigDecimal amountBd = new BigDecimal(amount).setScale(2, BigDecimal.ROUND_HALF_UP);
-            String amountString = amountBd.toString();
 
-            // set amount
-            String fullAmountString = amountString + " " + unitString;
-            ((TextView) findViewById(R.id.view_food_amount)).setText(fullAmountString);
+            // check and set price
+            String priceString = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_PRICE_PER));
+            if (!TextUtils.isEmpty(priceString)) {
+                mAbsolutePrice = Double.parseDouble(priceString);
+            }
+
+            unitSetup(mCurrentUnit);
 
             // check and set expiration
             String expString = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_EXPIRATION));
@@ -189,13 +191,6 @@ public class FoodViewActivity extends AppCompatActivity implements LoaderManager
                 now.setTimeInMillis(Long.parseLong(expString));
                 String dateString = (now.get(Calendar.MONTH)+1) + "/" + now.get(Calendar.DAY_OF_MONTH) + "/" + now.get(Calendar.YEAR);
                 ((TextView) findViewById(R.id.view_food_expires)).setText(dateString);
-            }
-
-            // check and set price
-            String priceString = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_PRICE_PER));
-            if (!TextUtils.isEmpty(priceString)) {
-                String fullPriceString = "$" + priceString + " / " + unitString;
-                ((TextView) findViewById(R.id.view_food_price)).setText(fullPriceString);
             }
 
             // check and set image
@@ -229,28 +224,60 @@ public class FoodViewActivity extends AppCompatActivity implements LoaderManager
                 ((ImageView) findViewById(R.id.view_food_image)).setImageBitmap(bitmap);
                 (findViewById(R.id.view_text_layout)).setOutlineProvider(ViewOutlineProvider.BACKGROUND);
             }
-
-            setupSpinner(unit);
         }
     }
 
     private void setAmountAndPrice() {
+        // get unit code and string
+        String unitString = mUnitNameArray.get(mCurrentUnit);
 
+        // convert amount
+        double amount = mAbsoluteAmount / mUnitConversionArray.get(mCurrentUnit);
+        BigDecimal amountBd = new BigDecimal(amount).setScale(2, BigDecimal.ROUND_HALF_UP);
+        String amountString = amountBd.toString();
+
+        // set amount
+        String fullAmountString = amountString + " " + unitString;
+        mAmountTextView.setText(fullAmountString);
+
+        // set price
+        if (mAbsolutePrice != -1) {
+            BigDecimal priceBd = new BigDecimal(mAbsolutePrice).setScale(2, BigDecimal.ROUND_HALF_UP);
+            String priceString = priceBd.toString();
+            String fullPriceString = "$" + priceString + " / " + unitString;
+            mPriceTextView.setText(fullPriceString);
+        }
     }
 
-    private void setupSpinner(int unit) {
-        int unitType = Utils.getUnitType(unit, this);
+    private void unitSetup(int unit) {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        String[] columns = new String[] {UnitContract.UnitEntry._ID, UnitContract.UnitEntry.COLUMN_NAME };
-        String selection = UnitContract.UnitEntry.COLUMN_TYPE + "=?";
-        String[] selectionArgs = new String[] { String.valueOf(unitType) };
-        Cursor cursor = db.query(UnitContract.UnitEntry.TABLE_NAME, columns, selection, selectionArgs, null, null, UnitContract.UnitEntry._ID);
+        // get unit type
+        String[] columns = new String[] {UnitContract.UnitEntry.COLUMN_TYPE};
+        String selection = UnitContract.UnitEntry._ID + "=?";
+        String[] selectionArgs = new String[]{String.valueOf(unit)};
+        Cursor cursor = db.query(UnitContract.UnitEntry.TABLE_NAME, columns, selection, selectionArgs, null, null, null);
+        cursor.moveToFirst();
+        int unitType = cursor.getInt(cursor.getColumnIndex(UnitContract.UnitEntry.COLUMN_TYPE));
+
+        // get needed values
+        columns = new String[] {UnitContract.UnitEntry._ID, UnitContract.UnitEntry.COLUMN_NAME, UnitContract.UnitEntry.COLUMN_CONVERT};
+        selection = UnitContract.UnitEntry.COLUMN_TYPE + "=?";
+        selectionArgs = new String[] { String.valueOf(unitType) };
+        cursor = db.query(UnitContract.UnitEntry.TABLE_NAME, columns, selection, selectionArgs, null, null, UnitContract.UnitEntry._ID);
         mUnitNameArray = new ArrayList<>();
-        mUnitPosArray = new ArrayList<>();
+        mUnitConversionArray = new ArrayList<>();
         while (cursor.moveToNext()) {
             mUnitNameArray.add(cursor.getString(cursor.getColumnIndex(UnitContract.UnitEntry.COLUMN_NAME)));
-            mUnitPosArray.add(cursor.getInt(cursor.getColumnIndex(UnitContract.UnitEntry._ID)));
+            mUnitConversionArray.add(cursor.getDouble(cursor.getColumnIndex(UnitContract.UnitEntry.COLUMN_CONVERT)));
+            if (cursor.getInt(cursor.getColumnIndex(UnitContract.UnitEntry._ID)) == unit)
+                mCurrentUnit = cursor.getPosition();
         }
+
+        // set text views
+        setAmountAndPrice();
+
+        cursor.close();
+        db.close();
     }
 
     @Override
