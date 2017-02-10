@@ -3,6 +3,7 @@ package xyz.marshallaf.myfridge;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -22,17 +23,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewOutlineProvider;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import xyz.marshallaf.myfridge.data.FoodContract;
 import xyz.marshallaf.myfridge.data.FoodDbHelper;
-
-import static android.R.attr.bitmap;
+import xyz.marshallaf.myfridge.data.UnitContract;
 
 /**
  * Created by Andrew Marshall on 2/8/2017.
@@ -45,6 +47,15 @@ public class FoodViewActivity extends AppCompatActivity implements LoaderManager
     private Uri mUri;
 
     private FoodDbHelper mDbHelper;
+
+    private double mAbsoluteAmount;
+    private ArrayList<String> mUnitNameArray;
+    private ArrayList<Integer> mUnitPosArray;
+
+    private TextView mPriceTextView;
+    private TextView mAmountTextView;
+
+    private ListAdapter mUnitAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -62,12 +73,31 @@ public class FoodViewActivity extends AppCompatActivity implements LoaderManager
             finish();
         }
 
+        // get db helper
+        mDbHelper = new FoodDbHelper(this);
+
         findViewById(R.id.view_action_change_unit).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(FoodViewActivity.this, "change unit!", Toast.LENGTH_SHORT).show();
+                showUnitSpinner();
             }
         });
+    }
+
+    private void showUnitSpinner() {
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        Cursor cursor = db.query(UnitContract.UnitEntry.TABLE_NAME, null, null, null, null, null, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Convert to");
+        String[] units = new String[mUnitNameArray.size()];
+        builder.setItems(mUnitNameArray.toArray(units), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Toast.makeText(FoodViewActivity.this, "You clicked on " + mUnitNameArray.get(i), Toast.LENGTH_LONG).show();
+                        dialogInterface.dismiss();
+                    }
+                });
+        builder.show();
     }
 
     @Override
@@ -143,8 +173,8 @@ public class FoodViewActivity extends AppCompatActivity implements LoaderManager
             String unitString = Utils.getUnitString(unit, this);
 
             // get amount
-            double amount = data.getDouble(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_AMOUNT));
-            amount = Utils.convert(amount, unit, false, this);
+            mAbsoluteAmount = data.getDouble(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_AMOUNT));
+            double amount = Utils.convert(mAbsoluteAmount, unit, false, this);
             BigDecimal amountBd = new BigDecimal(amount).setScale(2, BigDecimal.ROUND_HALF_UP);
             String amountString = amountBd.toString();
 
@@ -204,8 +234,23 @@ public class FoodViewActivity extends AppCompatActivity implements LoaderManager
         }
     }
 
-    private void setupSpinner(int unit) {
+    private void setAmountAndPrice() {
 
+    }
+
+    private void setupSpinner(int unit) {
+        int unitType = Utils.getUnitType(unit, this);
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        String[] columns = new String[] {UnitContract.UnitEntry._ID, UnitContract.UnitEntry.COLUMN_NAME };
+        String selection = UnitContract.UnitEntry.COLUMN_TYPE + "=?";
+        String[] selectionArgs = new String[] { String.valueOf(unitType) };
+        Cursor cursor = db.query(UnitContract.UnitEntry.TABLE_NAME, columns, selection, selectionArgs, null, null, UnitContract.UnitEntry._ID);
+        mUnitNameArray = new ArrayList<>();
+        mUnitPosArray = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            mUnitNameArray.add(cursor.getString(cursor.getColumnIndex(UnitContract.UnitEntry.COLUMN_NAME)));
+            mUnitPosArray.add(cursor.getInt(cursor.getColumnIndex(UnitContract.UnitEntry._ID)));
+        }
     }
 
     @Override
