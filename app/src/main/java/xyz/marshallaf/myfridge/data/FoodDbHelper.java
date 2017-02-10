@@ -39,6 +39,7 @@ public class FoodDbHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + UnitContract.UnitEntry.TABLE_NAME + " (" +
             UnitContract.UnitEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             UnitContract.UnitEntry.COLUMN_NAME + " TEXT NOT NULL, " +
+            UnitContract.UnitEntry.COLUMN_TYPE + " INTEGER NOT NULL, " +
             UnitContract.UnitEntry.COLUMN_CONVERT + " REAL NOT NULL);";
 
     public FoodDbHelper(Context context) {
@@ -59,76 +60,91 @@ public class FoodDbHelper extends SQLiteOpenHelper {
         // item
         cv.put(UnitContract.UnitEntry.COLUMN_NAME, mContext.getString(R.string.item));
         cv.put(UnitContract.UnitEntry.COLUMN_CONVERT, UnitContract.UnitEntry.UNIT_ITEM);
+        cv.put(UnitContract.UnitEntry.COLUMN_TYPE, UnitContract.UnitEntry.UNIT_TYPE_ITEM);
         valueList.add(new ContentValues(cv));
 
         // milliliter
         cv.put(UnitContract.UnitEntry.COLUMN_NAME, mContext.getString(R.string.milliliter));
         cv.put(UnitContract.UnitEntry.COLUMN_CONVERT, UnitContract.UnitEntry.ML_IN_ML);
+        cv.put(UnitContract.UnitEntry.COLUMN_TYPE, UnitContract.UnitEntry.UNIT_TYPE_VOLUME);
         valueList.add(new ContentValues(cv));
 
         // liter
         cv.put(UnitContract.UnitEntry.COLUMN_NAME, mContext.getString(R.string.liter));
         cv.put(UnitContract.UnitEntry.COLUMN_CONVERT, UnitContract.UnitEntry.ML_IN_L);
+        cv.put(UnitContract.UnitEntry.COLUMN_TYPE, UnitContract.UnitEntry.UNIT_TYPE_VOLUME);
         valueList.add(new ContentValues(cv));
 
         // fluid oz
         cv.put(UnitContract.UnitEntry.COLUMN_NAME, mContext.getString(R.string.fluid_oz));
         cv.put(UnitContract.UnitEntry.COLUMN_CONVERT, UnitContract.UnitEntry.ML_IN_FLOZ);
+        cv.put(UnitContract.UnitEntry.COLUMN_TYPE, UnitContract.UnitEntry.UNIT_TYPE_VOLUME);
         valueList.add(new ContentValues(cv));
 
         // pint
         cv.put(UnitContract.UnitEntry.COLUMN_NAME, mContext.getString(R.string.pint));
         cv.put(UnitContract.UnitEntry.COLUMN_CONVERT, UnitContract.UnitEntry.ML_IN_PINT);
+        cv.put(UnitContract.UnitEntry.COLUMN_TYPE, UnitContract.UnitEntry.UNIT_TYPE_VOLUME);
         valueList.add(new ContentValues(cv));
 
         // quart
         cv.put(UnitContract.UnitEntry.COLUMN_NAME, mContext.getString(R.string.quart));
         cv.put(UnitContract.UnitEntry.COLUMN_CONVERT, UnitContract.UnitEntry.ML_IN_QUART);
+        cv.put(UnitContract.UnitEntry.COLUMN_TYPE, UnitContract.UnitEntry.UNIT_TYPE_VOLUME);
         valueList.add(new ContentValues(cv));
 
         // gallon
         cv.put(UnitContract.UnitEntry.COLUMN_NAME, mContext.getString(R.string.gallon));
         cv.put(UnitContract.UnitEntry.COLUMN_CONVERT, UnitContract.UnitEntry.ML_IN_GALLON);
+        cv.put(UnitContract.UnitEntry.COLUMN_TYPE, UnitContract.UnitEntry.UNIT_TYPE_VOLUME);
         valueList.add(new ContentValues(cv));
 
         // teaspoon
         cv.put(UnitContract.UnitEntry.COLUMN_NAME, mContext.getString(R.string.teaspoon));
         cv.put(UnitContract.UnitEntry.COLUMN_CONVERT, UnitContract.UnitEntry.ML_IN_TSP);
+        cv.put(UnitContract.UnitEntry.COLUMN_TYPE, UnitContract.UnitEntry.UNIT_TYPE_VOLUME);
         valueList.add(new ContentValues(cv));
 
         // tablespoon
         cv.put(UnitContract.UnitEntry.COLUMN_NAME, mContext.getString(R.string.tablespoon));
         cv.put(UnitContract.UnitEntry.COLUMN_CONVERT, UnitContract.UnitEntry.ML_IN_TBSP);
+        cv.put(UnitContract.UnitEntry.COLUMN_TYPE, UnitContract.UnitEntry.UNIT_TYPE_VOLUME);
         valueList.add(new ContentValues(cv));
 
         // cup
         cv.put(UnitContract.UnitEntry.COLUMN_NAME, mContext.getString(R.string.cup));
         cv.put(UnitContract.UnitEntry.COLUMN_CONVERT, UnitContract.UnitEntry.ML_IN_CUP);
+        cv.put(UnitContract.UnitEntry.COLUMN_TYPE, UnitContract.UnitEntry.UNIT_TYPE_VOLUME);
         valueList.add(new ContentValues(cv));
 
         // gram
         cv.put(UnitContract.UnitEntry.COLUMN_NAME, mContext.getString(R.string.gram));
         cv.put(UnitContract.UnitEntry.COLUMN_CONVERT, UnitContract.UnitEntry.G_IN_G);
+        cv.put(UnitContract.UnitEntry.COLUMN_TYPE, UnitContract.UnitEntry.UNIT_TYPE_MASS);
         valueList.add(new ContentValues(cv));
 
         // milligram
         cv.put(UnitContract.UnitEntry.COLUMN_NAME, mContext.getString(R.string.milligram));
         cv.put(UnitContract.UnitEntry.COLUMN_CONVERT, UnitContract.UnitEntry.G_IN_MG);
+        cv.put(UnitContract.UnitEntry.COLUMN_TYPE, UnitContract.UnitEntry.UNIT_TYPE_MASS);
         valueList.add(new ContentValues(cv));
 
         // kilogram
         cv.put(UnitContract.UnitEntry.COLUMN_NAME, mContext.getString(R.string.kilogram));
         cv.put(UnitContract.UnitEntry.COLUMN_CONVERT, UnitContract.UnitEntry.G_IN_KG);
+        cv.put(UnitContract.UnitEntry.COLUMN_TYPE, UnitContract.UnitEntry.UNIT_TYPE_MASS);
         valueList.add(new ContentValues(cv));
 
         // ounce
         cv.put(UnitContract.UnitEntry.COLUMN_NAME, mContext.getString(R.string.ounce));
         cv.put(UnitContract.UnitEntry.COLUMN_CONVERT, UnitContract.UnitEntry.G_IN_OZ);
+        cv.put(UnitContract.UnitEntry.COLUMN_TYPE, UnitContract.UnitEntry.UNIT_TYPE_MASS);
         valueList.add(new ContentValues(cv));
 
         // pound
         cv.put(UnitContract.UnitEntry.COLUMN_NAME, mContext.getString(R.string.pound));
         cv.put(UnitContract.UnitEntry.COLUMN_CONVERT, UnitContract.UnitEntry.G_IN_POUND);
+        cv.put(UnitContract.UnitEntry.COLUMN_TYPE, UnitContract.UnitEntry.UNIT_TYPE_MASS);
         valueList.add(new ContentValues(cv));
 
         for (ContentValues values : valueList) {
