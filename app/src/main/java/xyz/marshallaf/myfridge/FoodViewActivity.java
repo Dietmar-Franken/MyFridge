@@ -242,7 +242,9 @@ public class FoodViewActivity extends AppCompatActivity implements LoaderManager
 
         // set price
         if (mAbsolutePrice != -1) {
-            BigDecimal priceBd = new BigDecimal(mAbsolutePrice).setScale(2, BigDecimal.ROUND_HALF_UP);
+            Log.d(LOG_TAG, "Absolute price: " + mAbsolutePrice);
+            double price = mAbsolutePrice * mUnitConversionArray.get(mCurrentUnit);
+            BigDecimal priceBd = new BigDecimal(price).setScale(2, BigDecimal.ROUND_HALF_UP);
             String priceString = priceBd.toString();
             String fullPriceString = "$" + priceString + " / " + unitString;
             mPriceTextView.setText(fullPriceString);

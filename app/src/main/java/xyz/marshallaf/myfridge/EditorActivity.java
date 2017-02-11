@@ -71,6 +71,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
     // storage variables for inputs to prevent data loss
     private int mUnit;
+    private double mAmount;
     private long mExpDate;
     private String mPhotoPath;
 
@@ -223,7 +224,12 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
         // convert numeric values and add to object
         float amount = Float.parseFloat(amountString);
-        values.put(FoodContract.FoodEntry.COLUMN_AMOUNT, amount);
+        // make sure that the amount is different, otherwise use cached
+        if (Math.abs(amount - mAmount) > 0.005) {
+            values.put(FoodContract.FoodEntry.COLUMN_AMOUNT, amount);
+        } else {
+            values.put(FoodContract.FoodEntry.COLUMN_AMOUNT, mAmount);
+        }
 
         if (!TextUtils.isEmpty(priceString)) {
             float price = Float.parseFloat(priceString);
@@ -288,16 +294,13 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             mNameTextView.setText(name);
 
             // set units
-            int unit = data.getInt(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_UNIT));
-            mUnit = unit;
+            mUnit = data.getInt(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_UNIT));
             mUnitSpinner.setSelection(mUnit-1);
 
             // set amount
             double amount = data.getDouble(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_AMOUNT));
-            amount = Utils.convert(amount, mUnit, false, this);
-            // TODO: this will cause precision loss because to store it takes the text value from the field
-            // to fix: only update the amount if the user typed something here
-            BigDecimal amountBd = new BigDecimal(amount).setScale(2, BigDecimal.ROUND_HALF_UP);
+            mAmount = Utils.convert(amount, mUnit, false, this);
+            BigDecimal amountBd = new BigDecimal(mAmount).setScale(2, BigDecimal.ROUND_HALF_UP);
             String amountString = amountBd.toString();
             mAmountTextView.setText(amountString);
 
@@ -318,7 +321,10 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             // set price per
             String priceString = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_PRICE_PER));
             if (!TextUtils.isEmpty(priceString)) {
-                mPriceTextView.setText(priceString);
+                // TODO: this could also cause precision loss but I think it's less likely
+                double price = Double.parseDouble(priceString);
+                price = amount * Utils.convert(price, mUnit, false, this);
+                mPriceTextView.setText(String.valueOf(price));
             }
 
             // set photo

@@ -106,6 +106,13 @@ public class FoodProvider extends ContentProvider {
             double amount = values.getAsDouble(FoodContract.FoodEntry.COLUMN_AMOUNT);
             int unit = values.getAsInteger(FoodContract.FoodEntry.COLUMN_UNIT);
 
+            // if available, convert price
+            if (values.containsKey(FoodContract.FoodEntry.COLUMN_PRICE_PER)) {
+                double price = values.getAsDouble(FoodContract.FoodEntry.COLUMN_PRICE_PER);
+                price /= amount;
+                values.put(FoodContract.FoodEntry.COLUMN_PRICE_PER, Utils.convert(price, unit, false, getContext()));
+            }
+
             values.put(FoodContract.FoodEntry.COLUMN_AMOUNT, Utils.convert(amount, unit, true, getContext()));
         }
         return values;
