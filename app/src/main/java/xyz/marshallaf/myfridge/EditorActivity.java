@@ -6,12 +6,13 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.FileProvider;
@@ -24,6 +25,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -78,8 +80,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     // click listener for expiration field
     private View.OnClickListener mExpClickListener;
 
-    // fab button
-    private FloatingActionButton mFabButton;
+    // add photo button
+    private Button mPhotoButton;
 
     // image request code (arbitrary)
     private static final int IMAGE_REQUEST_CODE = 1;
@@ -127,8 +129,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
         mExpTextView.setOnClickListener(mExpClickListener);
 
-        mFabButton = (FloatingActionButton) findViewById(R.id.fab_add_photo);
-        mFabButton.setOnClickListener(new View.OnClickListener() {
+        mPhotoButton = (Button) findViewById(R.id.action_add_photo);
+        mPhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // start the photo intent
@@ -323,15 +325,40 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             if (!TextUtils.isEmpty(priceString)) {
                 // TODO: this could also cause precision loss but I think it's less likely
                 double price = Double.parseDouble(priceString);
-                price = amount * Utils.convert(price, mUnit, false, this);
+                price = amount * Utils.convert(price, mUnit, true, this);
                 mPriceTextView.setText(String.valueOf(price));
             }
 
             // set photo
             String photoPath = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_PHOTO));
             if (!TextUtils.isEmpty(photoPath)) {
+                // TODO: fix this so it decodes after knowing the size and orientation needed, I think via a stream
+                // decode image
                 Bitmap bitmap = BitmapFactory.decodeFile(photoPath);
+
+                // get image orientation
+                try {
+                    ExifInterface exif = new ExifInterface(photoPath);
+                    int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
+                    Matrix matrix = new Matrix();
+                    switch (orientation) {
+                        case 6:
+                            matrix.postRotate(90);
+                            break;
+                        case 3:
+                            matrix.postRotate(180);
+                            break;
+                        case 8:
+                            matrix.postRotate(270);
+                            break;
+                    }
+                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                } catch (IOException e) {
+                    Log.e(LOG_TAG, "problem loading image", e);
+                }
+
                 mPhotoView.setImageBitmap(bitmap);
+                mPhotoButton.setText("Change photo");
             }
         }
     }
@@ -358,6 +385,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         if (requestCode == IMAGE_REQUEST_CODE && resultCode == RESULT_OK) {
             Bitmap bitmap = BitmapFactory.decodeFile(mPhotoPath);
             mPhotoView.setImageBitmap(bitmap);
+            mPhotoButton.setText("Change photo");
         }
     }
 

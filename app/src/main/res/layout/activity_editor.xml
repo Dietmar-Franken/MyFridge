@@ -113,25 +113,34 @@
                 android:layout_weight="1"
                 android:paddingTop="8dp"
                 android:text="Photo" />
-
-            <ImageView
-                android:id="@+id/edit_item_photo"
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:scaleType="fitCenter"
-                tools:src="@drawable/dummy_photo" />
+                android:orientation="vertical">
+                <Button
+                    android:id="@+id/action_add_photo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/colorAccent"
+                    android:textColor="@android:color/white"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="Add photo"/>
+
+                <ImageView
+                    android:id="@+id/edit_item_photo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:scaleType="fitCenter"
+                    tools:src="@drawable/dummy_photo" />
+
+            </LinearLayout>
+
         </LinearLayout>
 
     </LinearLayout>
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_add_photo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/ic_add_a_photo_white_24dp" />
 
 </RelativeLayout>
