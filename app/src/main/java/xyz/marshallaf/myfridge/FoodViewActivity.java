@@ -43,6 +43,8 @@ import xyz.marshallaf.myfridge.data.FoodDbHelper;
 import xyz.marshallaf.myfridge.data.UnitContract;
 
 /**
+ * Activity to view a food item.
+ *
  * Created by Andrew Marshall on 2/8/2017.
  */
 
@@ -104,105 +106,6 @@ public class FoodViewActivity extends AppCompatActivity implements LoaderManager
         });
     }
 
-    private void showUseDialog() {
-        View view = LayoutInflater.from(this).inflate(R.layout.use_food_dialog, null);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setView(view);
-
-        Spinner unitSpinner = (Spinner) view.findViewById(R.id.unit_spinner);
-
-        // create array adapter for spinner
-        ArrayAdapter unitSpinnerAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, mUnitNameArray);
-
-        // set dropdown style
-        unitSpinnerAdapter.setDropDownViewResource(R.layout.spinner_dialog_item);
-
-        // bind the adapter to the spinner
-        unitSpinner.setAdapter(unitSpinnerAdapter);
-
-        // set spinner position
-        unitSpinner.setSelection(mCurrentUnit);
-        mCurrentUseUnit = mCurrentUnit;
-
-        // set the on item click listener
-        unitSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long l) {
-                Log.d(LOG_TAG, "Position: " + position + ", ID: " + l);
-                mCurrentUseUnit = position;
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-                mCurrentUseUnit = mCurrentUnit;
-            }
-        });
-
-        final EditText amountInput = (EditText) view.findViewById(R.id.use_food_dialog_input);
-
-        builder.setPositiveButton(R.string.action_use_food_button, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                String amountString = amountInput.getText().toString();
-                if (!TextUtils.isEmpty(amountString)) {
-                    double amount = Double.parseDouble(amountString);
-                    useFood(amount);
-                }
-                if (dialogInterface != null) {
-                    dialogInterface.dismiss();
-                }
-            }
-        });
-
-        builder.setNegativeButton(R.string.action_use_food_cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                if (dialogInterface != null) {
-                    dialogInterface.dismiss();
-                }
-            }
-        });
-
-        builder.show();
-    }
-
-    private void useFood(double amount) {
-        // convert amount used to absolute
-        amount *= mUnitConversionArray.get(mCurrentUseUnit);
-
-        // make sure there is enough food
-        if (mAbsoluteAmount < amount) {
-            Toast.makeText(this, R.string.alert_not_enough_food, Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (amount != 0) {
-            mDidAmountChange = true;
-        }
-
-        // subtract from the total
-        mAbsoluteAmount -= amount;
-
-        // refresh views
-        setAmountAndPrice();
-    }
-
-    private void showUnitSpinner() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Convert to");
-        String[] units = new String[mUnitNameArray.size()];
-        builder.setItems(mUnitNameArray.toArray(units), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        mCurrentUnit = i;
-                        setAmountAndPrice();
-                        dialogInterface.dismiss();
-                    }
-                });
-        builder.show();
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_view, menu);
@@ -234,45 +137,12 @@ public class FoodViewActivity extends AppCompatActivity implements LoaderManager
         return super.onOptionsItemSelected(item);
     }
 
-    private void saveAmount() {
-        ContentValues values = new ContentValues();
-        values.put(FoodContract.FoodEntry.COLUMN_AMOUNT, mAbsoluteAmount);
-        getContentResolver().update(mUri, values, null, null);
-    }
-
     @Override
     protected void onStop() {
         super.onStop();
+        // make sure the amount is saved if user changed it
         if (mDidAmountChange) {
             saveAmount();
-        }
-    }
-
-    private void showDeleteDialog() {
-        // build the dialog
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Delete food item?");
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                if (dialogInterface != null) dialogInterface.dismiss();
-            }
-        });
-        builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                deleteItem();
-                finish();
-            }
-        });
-
-        // show the dialog
-        builder.show();
-    }
-
-    private void deleteItem() {
-        if (mUri != null) {
-            getContentResolver().delete(mUri, null, null);
         }
     }
 
@@ -281,6 +151,12 @@ public class FoodViewActivity extends AppCompatActivity implements LoaderManager
         return new CursorLoader(this, mUri, null, null, null, null);
     }
 
+    /**
+     * Callback invoked when loader returns with data.
+     * Populates all UI views, and sets appropriate fields.
+     * @param loader
+     * @param data
+     */
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         // check for data
@@ -345,6 +221,168 @@ public class FoodViewActivity extends AppCompatActivity implements LoaderManager
         }
     }
 
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
+
+    /**
+     * Shows a dialog allowing the user to "use" some of the food item.
+     */
+    private void showUseDialog() {
+        View view = LayoutInflater.from(this).inflate(R.layout.use_food_dialog, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(view);
+
+        Spinner unitSpinner = (Spinner) view.findViewById(R.id.unit_spinner);
+
+        // create array adapter for spinner
+        ArrayAdapter unitSpinnerAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, mUnitNameArray);
+
+        // set dropdown style
+        unitSpinnerAdapter.setDropDownViewResource(R.layout.spinner_dialog_item);
+
+        // bind the adapter to the spinner
+        unitSpinner.setAdapter(unitSpinnerAdapter);
+
+        // set spinner position
+        unitSpinner.setSelection(mCurrentUnit);
+        mCurrentUseUnit = mCurrentUnit;
+
+        // set the on item click listener
+        unitSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long l) {
+                Log.d(LOG_TAG, "Position: " + position + ", ID: " + l);
+                mCurrentUseUnit = position;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                mCurrentUseUnit = mCurrentUnit;
+            }
+        });
+
+        final EditText amountInput = (EditText) view.findViewById(R.id.use_food_dialog_input);
+
+        builder.setPositiveButton(R.string.action_use_food_button, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                String amountString = amountInput.getText().toString();
+                if (!TextUtils.isEmpty(amountString)) {
+                    double amount = Double.parseDouble(amountString);
+                    useFood(amount);
+                }
+                if (dialogInterface != null) {
+                    dialogInterface.dismiss();
+                }
+            }
+        });
+
+        builder.setNegativeButton(R.string.action_use_food_cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (dialogInterface != null) {
+                    dialogInterface.dismiss();
+                }
+            }
+        });
+
+        builder.show();
+    }
+
+    /**
+     * Validates and subtracts the amount of food that was "used".
+     * Invoked from the use dialog.
+     * @param amount of the food item used
+     */
+    private void useFood(double amount) {
+        // convert amount used to absolute
+        amount *= mUnitConversionArray.get(mCurrentUseUnit);
+
+        // make sure there is enough food
+        if (mAbsoluteAmount < amount) {
+            Toast.makeText(this, R.string.alert_not_enough_food, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (amount != 0) {
+            mDidAmountChange = true;
+        }
+
+        // subtract from the total
+        mAbsoluteAmount -= amount;
+
+        // refresh views
+        setAmountAndPrice();
+    }
+
+    /**
+     * Saves the updated amount of food to persistent storage.
+     */
+    private void saveAmount() {
+        ContentValues values = new ContentValues();
+        values.put(FoodContract.FoodEntry.COLUMN_AMOUNT, mAbsoluteAmount);
+        getContentResolver().update(mUri, values, null, null);
+    }
+
+    /**
+     * Deletes the viewed food item from persistent storage.
+     */
+    private void deleteItem() {
+        if (mUri != null) {
+            getContentResolver().delete(mUri, null, null);
+        }
+    }
+
+    /**
+     * Shows the available units when the user presses the "convert" button.
+     */
+    private void showUnitSpinner() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Convert to");
+        String[] units = new String[mUnitNameArray.size()];
+        builder.setItems(mUnitNameArray.toArray(units), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        mCurrentUnit = i;
+                        setAmountAndPrice();
+                        dialogInterface.dismiss();
+                    }
+                });
+        builder.show();
+    }
+
+    /**
+     * Shows the delete confirmation when the user requests to delete the item.
+     */
+    private void showDeleteDialog() {
+        // build the dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Delete food item?");
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (dialogInterface != null) dialogInterface.dismiss();
+            }
+        });
+        builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                deleteItem();
+                finish();
+            }
+        });
+
+        // show the dialog
+        builder.show();
+    }
+
+    /**
+     * Helper method to update the amount and price TextViews after food is used
+     * or the units are converted.
+     */
     private void setAmountAndPrice() {
         // get unit code and string
         String unitString = mUnitNameArray.get(mCurrentUnit);
@@ -369,6 +407,11 @@ public class FoodViewActivity extends AppCompatActivity implements LoaderManager
         }
     }
 
+    /**
+     * Helper method to populate member arrays with the unit names and conversion ratios.
+     *
+     * @param unit of the item
+     */
     private void unitSetup(int unit) {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
         // get unit type
@@ -398,10 +441,5 @@ public class FoodViewActivity extends AppCompatActivity implements LoaderManager
 
         cursor.close();
         db.close();
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-
     }
 }
