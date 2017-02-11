@@ -315,7 +315,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             String expString = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_EXPIRATION));
             if (!TextUtils.isEmpty(expString)) {
                 Calendar now = Calendar.getInstance();
-                now.setTimeInMillis(Long.parseLong(expString));
+                mExpDate = Long.parseLong(expString);
+                now.setTimeInMillis(mExpDate);
                 String dateString = (now.get(Calendar.MONTH)+1) + "/" + now.get(Calendar.DAY_OF_MONTH) + "/" + now.get(Calendar.YEAR);
                 mExpTextView.setText(dateString);
             }
