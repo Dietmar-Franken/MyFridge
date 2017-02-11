@@ -325,8 +325,10 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             if (!TextUtils.isEmpty(priceString)) {
                 // TODO: this could also cause precision loss but I think it's less likely
                 double price = Double.parseDouble(priceString);
-                price = amount * Utils.convert(price, mUnit, true, this);
-                mPriceTextView.setText(String.valueOf(price));
+                Log.d(LOG_TAG, "absolute price before conversion: " + price);
+                price = mAmount * Utils.convert(price, mUnit, true, this);
+                BigDecimal priceBd = new BigDecimal(price).setScale(2, BigDecimal.ROUND_HALF_UP);
+                mPriceTextView.setText(priceBd.toString());
             }
 
             // set photo
