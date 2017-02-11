@@ -44,16 +44,13 @@ import xyz.marshallaf.myfridge.data.FoodDbHelper;
 import xyz.marshallaf.myfridge.data.UnitContract;
 
 /**
- * Activity to view and edit food entries.
+ * Activity to insert and edit food entries.
  *
  * Created by Andrew Marshall on 1/26/2017.
  */
 
 public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, com.wdullaer.materialdatetimepicker.date.DatePickerDialog.OnDateSetListener {
     private final String LOG_TAG = EditorActivity.class.getName();
-
-    // if editing, true, otherwise false
-    private boolean isEditing = true;
 
     // uri passed to intent when the activity started
     private Uri mUri;
@@ -187,6 +184,106 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(this, mUri, null, null, null, null);
+    }
+
+    /**
+     * Callback triggered when the loader returns with the FoodEntry.
+     * Sets all the fields with the retrieved data.
+     */
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if (data.moveToFirst()) {
+            // set name
+            String name = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_NAME));
+            mNameTextView.setText(name);
+
+            // set units
+            mUnit = data.getInt(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_UNIT));
+            mUnitSpinner.setSelection(mUnit-1);
+
+            // set amount
+            double amount = data.getDouble(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_AMOUNT));
+            mAmount = Utils.convert(amount, mUnit, false, this);
+            BigDecimal amountBd = new BigDecimal(mAmount).setScale(2, BigDecimal.ROUND_HALF_UP);
+            String amountString = amountBd.toString();
+            mAmountTextView.setText(amountString);
+
+            // set store
+            String store = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_STORE));
+            if (!TextUtils.isEmpty(store)) {
+                mStoreTextView.setText(store);
+            }
+            // set expiration
+            String expString = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_EXPIRATION));
+            if (!TextUtils.isEmpty(expString)) {
+                Calendar now = Calendar.getInstance();
+                mExpDate = Long.parseLong(expString);
+                now.setTimeInMillis(mExpDate);
+                String dateString = (now.get(Calendar.MONTH)+1) + "/" + now.get(Calendar.DAY_OF_MONTH) + "/" + now.get(Calendar.YEAR);
+                mExpTextView.setText(dateString);
+            }
+
+            // set price per
+            String priceString = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_PRICE_PER));
+            if (!TextUtils.isEmpty(priceString)) {
+                // TODO: this could also cause precision loss but I think it's less likely
+                double price = Double.parseDouble(priceString);
+                Log.d(LOG_TAG, "absolute price before conversion: " + price);
+                price = mAmount * Utils.convert(price, mUnit, true, this);
+                BigDecimal priceBd = new BigDecimal(price).setScale(2, BigDecimal.ROUND_HALF_UP);
+                mPriceTextView.setText(priceBd.toString());
+            }
+
+            // set photo
+            String photoPath = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_PHOTO));
+            if (!TextUtils.isEmpty(photoPath)) {
+                setPhotoView(photoPath);
+                mPhotoButton.setText("Change photo");
+            }
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        // null all the text views
+        for (EditText view : mEditTexts) {
+            view.setText(null);
+        }
+    }
+
+    /**
+     * Callback triggered when user selects a date on the date picker.
+     * Sets the user-facing TextView and the date long for use in db storage.
+     */
+    @Override
+    public void onDateSet(com.wdullaer.materialdatetimepicker.date.DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
+        String date = (monthOfYear+1)+"/"+dayOfMonth+"/"+year;
+        mExpTextView.setText(date);
+        Calendar now = Calendar.getInstance();
+        now.set(year, monthOfYear, dayOfMonth);
+        mExpDate = now.getTimeInMillis();
+    }
+
+    /**
+     * Callback triggered when the camera intent returns.
+     * Sets the photo view and changes the photo button.
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == IMAGE_REQUEST_CODE && resultCode == RESULT_OK) {
+            setPhotoView(mPhotoPath);
+            mPhotoButton.setText("Change photo");
+        }
+    }
+
+    /**
+     * Helper method to save input values to persistent storage.
+     *
+     * @return true if item was saved, false otherwise
+     */
     private boolean saveItem() {
         // get values from editor fields
         String name = mNameTextView.getText().toString();
@@ -248,6 +345,10 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         return true;
     }
 
+    /**
+     * Helper method to setup the unit spinner.
+     * Retrieves units from UnitDB and populates spinner, and sets click listeners.
+     */
     private void setupSpinner() {
         final SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
@@ -283,115 +384,47 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         });
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(this, mUri, null, null, null, null);
-    }
+    /**
+     * Helper method to display the image.
+     * Decodes the image with the correct orientation and sets the imageView.
+     *
+     * @param photoPath absolute path to the image
+     */
+    private void setPhotoView(String photoPath) {
+        // TODO: fix this so it decodes after knowing the size and orientation needed, I think via a stream
+        // decode image
+        Bitmap bitmap = BitmapFactory.decodeFile(photoPath);
 
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if (data.moveToFirst()) {
-            // set name
-            String name = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_NAME));
-            mNameTextView.setText(name);
-
-            // set units
-            mUnit = data.getInt(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_UNIT));
-            mUnitSpinner.setSelection(mUnit-1);
-
-            // set amount
-            double amount = data.getDouble(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_AMOUNT));
-            mAmount = Utils.convert(amount, mUnit, false, this);
-            BigDecimal amountBd = new BigDecimal(mAmount).setScale(2, BigDecimal.ROUND_HALF_UP);
-            String amountString = amountBd.toString();
-            mAmountTextView.setText(amountString);
-
-            // set store
-            String store = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_STORE));
-            if (!TextUtils.isEmpty(store)) {
-                mStoreTextView.setText(store);
+        // get image orientation
+        try {
+            ExifInterface exif = new ExifInterface(photoPath);
+            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
+            Matrix matrix = new Matrix();
+            switch (orientation) {
+                case 6:
+                    matrix.postRotate(90);
+                    break;
+                case 3:
+                    matrix.postRotate(180);
+                    break;
+                case 8:
+                    matrix.postRotate(270);
+                    break;
             }
-            // set expiration
-            String expString = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_EXPIRATION));
-            if (!TextUtils.isEmpty(expString)) {
-                Calendar now = Calendar.getInstance();
-                mExpDate = Long.parseLong(expString);
-                now.setTimeInMillis(mExpDate);
-                String dateString = (now.get(Calendar.MONTH)+1) + "/" + now.get(Calendar.DAY_OF_MONTH) + "/" + now.get(Calendar.YEAR);
-                mExpTextView.setText(dateString);
-            }
-
-            // set price per
-            String priceString = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_PRICE_PER));
-            if (!TextUtils.isEmpty(priceString)) {
-                // TODO: this could also cause precision loss but I think it's less likely
-                double price = Double.parseDouble(priceString);
-                Log.d(LOG_TAG, "absolute price before conversion: " + price);
-                price = mAmount * Utils.convert(price, mUnit, true, this);
-                BigDecimal priceBd = new BigDecimal(price).setScale(2, BigDecimal.ROUND_HALF_UP);
-                mPriceTextView.setText(priceBd.toString());
-            }
-
-            // set photo
-            String photoPath = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_PHOTO));
-            if (!TextUtils.isEmpty(photoPath)) {
-                // TODO: fix this so it decodes after knowing the size and orientation needed, I think via a stream
-                // decode image
-                Bitmap bitmap = BitmapFactory.decodeFile(photoPath);
-
-                // get image orientation
-                try {
-                    ExifInterface exif = new ExifInterface(photoPath);
-                    int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
-                    Matrix matrix = new Matrix();
-                    switch (orientation) {
-                        case 6:
-                            matrix.postRotate(90);
-                            break;
-                        case 3:
-                            matrix.postRotate(180);
-                            break;
-                        case 8:
-                            matrix.postRotate(270);
-                            break;
-                    }
-                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                } catch (IOException e) {
-                    Log.e(LOG_TAG, "problem loading image", e);
-                }
-
-                mPhotoView.setImageBitmap(bitmap);
-                mPhotoButton.setText("Change photo");
-            }
+            bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "problem loading image", e);
         }
+
+        mPhotoView.setImageBitmap(bitmap);
     }
 
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        // null all the text views
-        for (EditText view : mEditTexts) {
-            view.setText(null);
-        }
-    }
-
-    @Override
-    public void onDateSet(com.wdullaer.materialdatetimepicker.date.DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
-        String date = (monthOfYear+1)+"/"+dayOfMonth+"/"+year;
-        mExpTextView.setText(date);
-        Calendar now = Calendar.getInstance();
-        now.set(year, monthOfYear, dayOfMonth);
-        mExpDate = now.getTimeInMillis();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == IMAGE_REQUEST_CODE && resultCode == RESULT_OK) {
-            Bitmap bitmap = BitmapFactory.decodeFile(mPhotoPath);
-            mPhotoView.setImageBitmap(bitmap);
-            mPhotoButton.setText("Change photo");
-        }
-    }
-
+    /**
+     * Helper method to create an image file in which to store a photo result.
+     *
+     * @return empty image file
+     * @throws IOException
+     */
     private File createImageFile() throws IOException {
         // create a unique file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
