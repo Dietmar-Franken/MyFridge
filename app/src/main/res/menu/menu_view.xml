@@ -5,12 +5,6 @@
     tools:context=".FoodViewActivity">
 
     <item
-        android:id="@+id/action_save"
-        android:title="Save"
-        android:icon="@drawable/ic_check_white_24dp"
-        app:showAsAction="always"/>
-
-    <item
         android:id="@+id/action_edit"
         android:title="Edit"
         android:icon="@drawable/ic_mode_edit_white_24dp"

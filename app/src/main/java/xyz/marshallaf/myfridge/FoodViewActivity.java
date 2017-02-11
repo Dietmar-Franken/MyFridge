@@ -1,5 +1,6 @@
 package xyz.marshallaf.myfridge;
 
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -12,19 +13,25 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.app.NavUtils;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewOutlineProvider;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -50,12 +57,15 @@ public class FoodViewActivity extends AppCompatActivity implements LoaderManager
     private double mAbsoluteAmount;
     private double mAbsolutePrice = -1;
     private int mCurrentUnit;
+    private int mCurrentUseUnit;
 
     private ArrayList<String> mUnitNameArray;
     private ArrayList<Double> mUnitConversionArray;
 
     private TextView mPriceTextView;
     private TextView mAmountTextView;
+
+    private boolean mDidAmountChange = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -85,6 +95,97 @@ public class FoodViewActivity extends AppCompatActivity implements LoaderManager
                 showUnitSpinner();
             }
         });
+
+        findViewById(R.id.action_use_food).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showUseDialog();
+            }
+        });
+    }
+
+    private void showUseDialog() {
+        View view = LayoutInflater.from(this).inflate(R.layout.use_food_dialog, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(view);
+
+        Spinner unitSpinner = (Spinner) view.findViewById(R.id.unit_spinner);
+
+        // create array adapter for spinner
+        ArrayAdapter unitSpinnerAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, mUnitNameArray);
+
+        // set dropdown style
+        unitSpinnerAdapter.setDropDownViewResource(R.layout.spinner_dialog_item);
+
+        // bind the adapter to the spinner
+        unitSpinner.setAdapter(unitSpinnerAdapter);
+
+        // set spinner position
+        unitSpinner.setSelection(mCurrentUnit);
+        mCurrentUseUnit = mCurrentUnit;
+
+        // set the on item click listener
+        unitSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long l) {
+                Log.d(LOG_TAG, "Position: " + position + ", ID: " + l);
+                mCurrentUseUnit = position;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                mCurrentUseUnit = mCurrentUnit;
+            }
+        });
+
+        final EditText amountInput = (EditText) view.findViewById(R.id.use_food_dialog_input);
+
+        builder.setPositiveButton(R.string.action_use_food_button, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                String amountString = amountInput.getText().toString();
+                if (!TextUtils.isEmpty(amountString)) {
+                    double amount = Double.parseDouble(amountString);
+                    useFood(amount);
+                }
+                if (dialogInterface != null) {
+                    dialogInterface.dismiss();
+                }
+            }
+        });
+
+        builder.setNegativeButton(R.string.action_use_food_cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (dialogInterface != null) {
+                    dialogInterface.dismiss();
+                }
+            }
+        });
+
+        builder.show();
+    }
+
+    private void useFood(double amount) {
+        // convert amount used to absolute
+        amount *= mUnitConversionArray.get(mCurrentUseUnit);
+
+        // make sure there is enough food
+        if (mAbsoluteAmount < amount) {
+            Toast.makeText(this, R.string.alert_not_enough_food, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (amount != 0) {
+            mDidAmountChange = true;
+        }
+
+        // subtract from the total
+        mAbsoluteAmount -= amount;
+
+        // refresh views
+        setAmountAndPrice();
     }
 
     private void showUnitSpinner() {
@@ -117,9 +218,12 @@ public class FoodViewActivity extends AppCompatActivity implements LoaderManager
                 intent.putExtra(FoodContract.FoodEntry.FOOD_URI_KEY, mUri);
                 startActivity(intent);
                 return true;
-            case R.id.action_save:
+            case android.R.id.home:
                 // save amount to db
-
+                if (mDidAmountChange) {
+                    saveAmount();
+                }
+                NavUtils.navigateUpFromSameTask(this);
                 return true;
             case R.id.action_delete:
                 // show delete prompt
@@ -128,6 +232,20 @@ public class FoodViewActivity extends AppCompatActivity implements LoaderManager
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void saveAmount() {
+        ContentValues values = new ContentValues();
+        values.put(FoodContract.FoodEntry.COLUMN_AMOUNT, mAbsoluteAmount);
+        getContentResolver().update(mUri, values, null, null);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mDidAmountChange) {
+            saveAmount();
+        }
     }
 
     private void showDeleteDialog() {
