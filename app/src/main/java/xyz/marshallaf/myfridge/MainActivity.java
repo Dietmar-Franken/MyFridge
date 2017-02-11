@@ -191,9 +191,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private void deleteAllItems() {
         int rowsAffected = getContentResolver().delete(FoodContract.FoodEntry.CONTENT_URI, null, null);
         if (rowsAffected > 0) {
-            Toast.makeText(this, "All items deleted.", Toast.LENGTH_SHORT);
+            Toast.makeText(this, "All items deleted.", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(this, "Error deleting items. No changes made.", Toast.LENGTH_SHORT);
+            Toast.makeText(this, "Error deleting items. No changes made.", Toast.LENGTH_SHORT).show();
         }
     }
 }
