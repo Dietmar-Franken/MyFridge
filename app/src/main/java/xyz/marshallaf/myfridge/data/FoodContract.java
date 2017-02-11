@@ -4,7 +4,7 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 
 /**
- * Specifies the schema of the database.
+ * Specifies the schema of the food database.
  *
  * Created by Andrew Marshall on 1/23/2017.
  */
