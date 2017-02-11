@@ -12,6 +12,8 @@ import android.widget.TextView;
 import xyz.marshallaf.myfridge.data.FoodContract.FoodEntry;
 
 /**
+ * Cursor adapter to display food list in MainActivity.
+ *
  * Created by Andrew Marshall on 1/24/2017.
  */
 
