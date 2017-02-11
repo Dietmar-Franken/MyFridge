@@ -27,6 +27,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -173,15 +174,17 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
         switch(item.getItemId()) {
             case R.id.editor_save:
-                saveItem();
-                finish();
+                boolean saved = saveItem();
+                if (saved) {
+                    finish();
+                }
                 return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    private void saveItem() {
+    private boolean saveItem() {
         // get values from editor fields
         String name = mNameTextView.getText().toString();
         String store = mStoreTextView.getText().toString();
@@ -189,11 +192,21 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         String amountString = mAmountTextView.getText().toString();
         String expiration = mExpTextView.getText().toString();
 
-        // TODO: don't let user save unless required fields are filled in
-
         // add values to object
         ContentValues values = new ContentValues();
-        values.put(FoodContract.FoodEntry.COLUMN_NAME, name);
+        // validate and add name
+        if (!TextUtils.isEmpty(name)) {
+            values.put(FoodContract.FoodEntry.COLUMN_NAME, name);
+        } else {
+            Toast.makeText(this, "The item must have a name!", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        // validate amount
+        if (TextUtils.isEmpty(amountString)) {
+            Toast.makeText(this, "The item must have an amount!", Toast.LENGTH_SHORT).show();
+            return false;
+        }
         values.put(FoodContract.FoodEntry.COLUMN_UNIT, mUnit);
 
         if (!TextUtils.isEmpty(expiration)) {
@@ -223,6 +236,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         } else {
             getContentResolver().update(mUri, values, null, null);
         }
+
+        return true;
     }
 
     private void setupSpinner() {
