@@ -3,6 +3,8 @@ package xyz.marshallaf.myfridge.data;
 import android.provider.BaseColumns;
 
 /**
+ * Database schema contract for units.
+ *
  * Created by Andrew Marshall on 1/29/2017.
  */
 
