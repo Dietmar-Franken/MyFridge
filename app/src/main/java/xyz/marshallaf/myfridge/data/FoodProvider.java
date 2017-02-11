@@ -100,24 +100,6 @@ public class FoodProvider extends ContentProvider {
         }
     }
 
-    private ContentValues convertForStorage(ContentValues values) {
-        if (values.containsKey(FoodContract.FoodEntry.COLUMN_UNIT) &&
-                values.containsKey(FoodContract.FoodEntry.COLUMN_AMOUNT)) {
-            double amount = values.getAsDouble(FoodContract.FoodEntry.COLUMN_AMOUNT);
-            int unit = values.getAsInteger(FoodContract.FoodEntry.COLUMN_UNIT);
-
-            // if available, convert price
-            if (values.containsKey(FoodContract.FoodEntry.COLUMN_PRICE_PER)) {
-                double price = values.getAsDouble(FoodContract.FoodEntry.COLUMN_PRICE_PER);
-                price /= amount;
-                values.put(FoodContract.FoodEntry.COLUMN_PRICE_PER, Utils.convert(price, unit, false, getContext()));
-            }
-
-            values.put(FoodContract.FoodEntry.COLUMN_AMOUNT, Utils.convert(amount, unit, true, getContext()));
-        }
-        return values;
-    }
-
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
@@ -171,6 +153,33 @@ public class FoodProvider extends ContentProvider {
         if (rowsAffected > 0) getContext().getContentResolver().notifyChange(uri, null);
 
         return rowsAffected;
+    }
+
+    /**
+     * Converts amount and price to "absolute" values before storing.
+     * Each unit type has an absolute unit to aid with conversion. The stored amount will
+     * be in this unit (e.g. mL for volume), and the stored price will be the price per absolute
+     * value.
+     *
+     * @param values values to check for conversion
+     * @return values that are ready for storage
+     */
+    private ContentValues convertForStorage(ContentValues values) {
+        if (values.containsKey(FoodContract.FoodEntry.COLUMN_UNIT) &&
+                values.containsKey(FoodContract.FoodEntry.COLUMN_AMOUNT)) {
+            double amount = values.getAsDouble(FoodContract.FoodEntry.COLUMN_AMOUNT);
+            int unit = values.getAsInteger(FoodContract.FoodEntry.COLUMN_UNIT);
+
+            // if available, convert price
+            if (values.containsKey(FoodContract.FoodEntry.COLUMN_PRICE_PER)) {
+                double price = values.getAsDouble(FoodContract.FoodEntry.COLUMN_PRICE_PER);
+                price /= amount;
+                values.put(FoodContract.FoodEntry.COLUMN_PRICE_PER, Utils.convert(price, unit, false, getContext()));
+            }
+
+            values.put(FoodContract.FoodEntry.COLUMN_AMOUNT, Utils.convert(amount, unit, true, getContext()));
+        }
+        return values;
     }
 
     /**
