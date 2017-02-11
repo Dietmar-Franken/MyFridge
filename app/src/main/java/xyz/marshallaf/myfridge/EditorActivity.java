@@ -240,7 +240,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         ArrayAdapter unitSpinnerAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, unitArray);
 
         // set dropdown style
-        unitSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+        unitSpinnerAdapter.setDropDownViewResource(R.layout.spinner_dialog_item);
 
         // bind the adapter to the spinner
         mUnitSpinner.setAdapter(unitSpinnerAdapter);
