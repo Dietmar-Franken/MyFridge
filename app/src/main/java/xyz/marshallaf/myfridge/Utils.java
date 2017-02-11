@@ -8,6 +8,8 @@ import xyz.marshallaf.myfridge.data.FoodDbHelper;
 import xyz.marshallaf.myfridge.data.UnitContract;
 
 /**
+ * Utility functions.
+ *
  * Created by Andrew Marshall on 1/24/2017.
  */
 
@@ -15,6 +17,15 @@ public final class Utils {
     // not instantiable
     private Utils() {}
 
+    /**
+     * Converts amounts to or from the "absolute" units.
+     *
+     * @param amount to convert
+     * @param unit units to convert from or to
+     * @param forStorage if true, will convert to "absolute" units. If false, will convert to unit.
+     * @param context
+     * @return converted amount
+     */
     public static double convert(double amount, int unit, boolean forStorage, Context context) {
         // get conversion factor for unit in question
         FoodDbHelper dbHelper = new FoodDbHelper(context);
@@ -36,6 +47,13 @@ public final class Utils {
         }
     }
 
+    /**
+     * Get the user-readable name of the unit.
+     *
+     * @param unit to find
+     * @param context
+     * @return name of the unit
+     */
     public static String getUnitString(int unit, Context context) {
         FoodDbHelper dbHelper = new FoodDbHelper(context);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -52,6 +70,13 @@ public final class Utils {
         return unitString;
     }
 
+    /**
+     * Returns the code for unit type (mass, volume, item).
+     *
+     * @param unit to find
+     * @param context
+     * @return code for type of unit
+     */
     public static int getUnitType(int unit, Context context) {
         FoodDbHelper dbHelper = new FoodDbHelper(context);
         SQLiteDatabase db = dbHelper.getReadableDatabase();

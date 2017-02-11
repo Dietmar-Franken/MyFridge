@@ -26,11 +26,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import xyz.marshallaf.myfridge.data.FoodContract;
-import xyz.marshallaf.myfridge.data.FoodDbHelper;
 
+/**
+ * Activity to display the full list of items available.
+ *
+ * Created by Andrew Marshall on 1/23/2017.
+ */
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private FoodDbHelper mDbHelper;
     private FoodCursorAdapter mCursorAdapter;
     private View mEmptyView;
 
@@ -49,8 +52,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 startActivity(intent);
             }
         });
-        
-        mDbHelper = new FoodDbHelper(this);
 
         // create the cursor adapter
         mCursorAdapter = new FoodCursorAdapter(this, null);
@@ -130,6 +131,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mCursorAdapter.swapCursor(null);
     }
 
+    /**
+     * Shows the delete dialog when user requests to delete all items.
+     */
     private void showDeleteDialog() {
         // get the view
         View view = LayoutInflater.from(this).inflate(R.layout.delete_all_dialog, null);
@@ -180,6 +184,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         });
     }
 
+    /**
+     * Deletes all the items from persistent storage.
+     * Invoked from delete dialog.
+     */
     private void deleteAllItems() {
         int rowsAffected = getContentResolver().delete(FoodContract.FoodEntry.CONTENT_URI, null, null);
         if (rowsAffected > 0) {
