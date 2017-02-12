@@ -1,36 +1,41 @@
 # MyFridge
 
-This is an app I made as the final project for the Udacity course [Android Basics: Data Storage](https://www.udacity.com/course/android-basics-data-storage--ud845). The assignment was to build an app that maintains and displays a list of inventory for an imaginary business.
-
-![alt text](https://github.com/marshallaf/MyFridge/blob/master/screen1_w280.jpg "Main app screen")
-![alt text](https://github.com/marshallaf/MyFridge/blob/master/screen2_w280.jpg "Search prompt")
-![alt text](https://github.com/marshallaf/MyFridge/blob/master/screen3_w280.jpg "Settings")
-
+This is an app I made as the final project for the Udacity course [Android Basics: Data Storage](https://www.udacity.com/course/android-basics-data-storage--ud845).
 
 ## The course
-The course taught the basics of querying an API for JSON data in an Android app. I had some experience with Java JSON parsing and with `AsyncTask`s in Android, and from there the instructors outlined the benefits of using an `AsyncTaskLoader` (instead of only an `AsyncTask`) for more efficient handling of UI activity changes.
+The course taught the basics of database operations in Android using a SQLite database. From there, the instructors transitioned us to using Loaders and ContentResolvers instead of direct database operations, for better UI responsiveness and inter-operability between other apps.
 
-Throughout the course, we built the QuakeReport app, which displayed data retrieved from the [USGS API](http://earthquake.usgs.gov/fdsnws/event/1/). The NewsReader app, as assigned, is largely just re-implementing the fetching logic from the QuakeReport app and adding appropriate layout files to support displaying articles.
+The final assignment was to build an app that maintains and displays a list of inventory for an imaginary business.
 
-## The extra stuff
-I didn't think that I'd learn much from simply porting code from the QuakeReport app to the NewsReader app. I decided to add a couple extra goals to make the app better, features that I'd have to learn how to implement on my own:
-* Infinite scrolling
-* Floating action button
-* Image loading/display
+## My app
+I wanted to build an app that I could actually use myself; instead of a business inventory, this app maintains an inventory of the stuff that I have in the fridge/pantry. I have a bad habit of going shopping without checking beforehand what I have, so I end up with duplicates of a lot of stuff (especially spices - I have an absurd amount of cumin!).
 
-### Infinite scrolling
-The API returns only 10 results by default, which is a paltry amount if you're actually going to read the news. I wanted that functionality where the results just keep coming, as long as you keep scrolling.
+![alt text](https://github.com/marshallaf/MyFridge/blob/master/screen1_w280.jpg "Main app screen")
+![alt text](https://github.com/marshallaf/MyFridge/blob/master/screen2_w280.jpg "Editor activity")
+![alt text](https://github.com/marshallaf/MyFridge/blob/master/screen3_w280.jpg "View activity")
 
-This is pretty easy to implement with an `OnScrollListener` to check the user's current position, and then I used the same `Loader` to fetch additional data.
+It turned out pretty well for a first run. I'm especially pleased with the conversion functionality - the user can change the units displayed and the app converts to different units. In addition, when you mark some of the food as used, you can specify the units and the app does the correct calculation for you.
 
-### Floating action button
-Having to go into settings to change the search term is not a great user experience, IMO, so I thought I'd add one of those cool Material Design action buttons for an additional way to change the search term. I had never used a dialog box (outside of settings) in an Android app before, so that was good to learn.
+![alt text](https://github.com/marshallaf/MyFridge/blob/master/screen4_w280.jpg "Units converted")
+![alt text](https://github.com/marshallaf/MyFridge/blob/master/screen5_w280.jpg "Using food")
+![alt text](https://github.com/marshallaf/MyFridge/blob/master/screen6_w280.jpg "Food used")
 
-### Image loading/display
-Only having text in the main activity was pretty boring, and I wanted to add a small version of the article's associated image to the main `ListView`. I knew about image loading libraries like [Picasso](http://square.github.io/picasso/), but I wanted to try to implement it on my own this time. It's always good to have some idea about what kinds of things are being abstracted away from you when you use libraries.
+Some of the concepts that I had to learn on my own for this were:
+* Camera intents and stored files
+* Enabling/disabling UI elements
+* Figma
 
-And turns out with image loading, it's quite a bit.
+### Camera intents and stored files
+I wanted to add the ability to take photos of the items. Using a camera intent was very easy, and I had never used a `onActivityResult` callback before, so that was valuable to learn. I also had to deal with loading the image in the correct orientation, which I did via a standard approach using the EXIF data and a `Matrix` object for the transform. However, I did this on the UI thread (I know, bad) so I'll need to fix this using a loader in a future commit so it's a little more peppy.
 
-I initially used an `AsyncTask` with a `Drawable` to fetch images from the URL provided by the API, which worked well enough. However, the supplied images were much larger than I needed, so I read the [Displaying Bitmaps Efficiently](https://developer.android.com/training/displaying-bitmaps/index.html) Android training to help me resize the image while loading it to use memory more efficiently. I then continued in the training to handle view recycling in the `ListView` and cancelling the image loading task if it was no longer needed.
+### Enabling/disabling UI elements
+In the `MainActivity` there's an option to delete all the entries. I wanted to make one of those confirmation dialogs that make you type the word "delete" before allowing you to take such a drastic action. I implemented a `TextWatcher` to monitor the text box for changes and only enable the "delete" button if the user had typed the word delete.
 
-This was a ton of logic to add, and I didn't even get to the proper caching of images! I can definitely see the benefit that libraries like Picasso provide, and I'll use them in the future with some knowledge of what they're taking care of under the hood.
+I also toyed with disabling/enabling EditTexts in the EditorActivity, as originally I tried to have that activity serve both view and editing functions. This was a little more cumbersome than a button, but I was able to make it work. However, I scrapped it when I decided to polish the view UI a bit more and the dual purpose editor was no longer needed.
+
+### Figma
+I built the mocks for the FoodViewActivity in [Figma](https://www.figma.com/), an online mock-up creator that is awesome! I had never used a UI design app before and I was very pleased. It is so much easier and faster to try stuff out and build an outline in Figma than doing it in code in Android Studio initially.
+
+## Future possibilities
+* Use loader for images
+* Add recipes
