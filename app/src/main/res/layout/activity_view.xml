@@ -79,7 +79,7 @@
                     android:textSize="18sp"
                     android:layout_gravity="center_vertical"
                     android:layout_marginRight="16dp"
-                    android:text="Amount left"/>
+                    android:text="@string/view_label_amount"/>
 
                 <TextView
                     android:id="@+id/view_food_amount"
@@ -123,7 +123,7 @@
                 android:textSize="18sp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginRight="16dp"
-                android:text="Price"/>
+                android:text="@string/view_label_price"/>
 
             <TextView
                 android:id="@+id/view_food_price"
@@ -154,7 +154,7 @@
                 android:textSize="18sp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginRight="16dp"
-                android:text="Expires"/>
+                android:text="@string/view_label_expires"/>
 
             <TextView
                 android:id="@+id/view_food_expires"
