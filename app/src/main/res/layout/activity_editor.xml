@@ -15,7 +15,7 @@
             android:id="@+id/edit_item_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="item name"
+            android:hint="@string/item_name_hint"
             android:textSize="24sp" />
 
         <LinearLayout
@@ -27,14 +27,14 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Amount" />
+                android:text="@string/label_amount" />
 
             <EditText
                 android:id="@+id/edit_item_amount"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="number of"
+                android:hint="@string/item_amount_hint"
                 android:inputType="number" />
 
             <Spinner
@@ -54,7 +54,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Expiration" />
+                android:text="@string/label_expiration" />
 
             <EditText
                 android:id="@+id/edit_item_expiration"
@@ -62,7 +62,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:focusable="false"
-                android:hint="date" />
+                android:hint="@string/item_expiration_hint" />
         </LinearLayout>
 
         <LinearLayout
@@ -73,14 +73,14 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Store" />
+                android:text="@string/label_store" />
 
             <EditText
                 android:id="@+id/edit_item_store"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:hint="purchased at" />
+                android:hint="@string/item_store_hint" />
         </LinearLayout>
 
         <LinearLayout
@@ -91,14 +91,14 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Total price" />
+                android:text="@string/label_price" />
 
             <EditText
                 android:id="@+id/edit_item_price"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:hint="price"
+                android:hint="@string/item_price_hint"
                 android:inputType="numberDecimal" />
         </LinearLayout>
 
@@ -112,7 +112,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:paddingTop="8dp"
-                android:text="Photo" />
+                android:text="@string/label_photo" />
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -128,7 +128,7 @@
                     android:paddingRight="16dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
-                    android:text="Add photo"/>
+                    android:text="@string/button_photo_add"/>
 
                 <ImageView
                     android:id="@+id/edit_item_photo"

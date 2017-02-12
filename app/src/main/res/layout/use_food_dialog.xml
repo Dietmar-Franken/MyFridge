@@ -22,7 +22,7 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="@string/amount_label"/>
+            android:text="@string/label_amount"/>
 
         <EditText
             android:id="@+id/use_food_dialog_input"
