@@ -154,8 +154,6 @@ public class FoodViewActivity extends AppCompatActivity implements LoaderManager
     /**
      * Callback invoked when loader returns with data.
      * Populates all UI views, and sets appropriate fields.
-     * @param loader
-     * @param data
      */
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
