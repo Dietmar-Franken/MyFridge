@@ -74,9 +74,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private long mExpDate;
     private String mPhotoPath;
 
-    // click listener for expiration field
-    private View.OnClickListener mExpClickListener;
-
     // add photo button
     private Button mPhotoButton;
 
@@ -109,7 +106,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mEditTexts.add(mPriceTextView);
         mEditTexts.add(mExpTextView);
 
-        mExpClickListener = new View.OnClickListener() {
+        View.OnClickListener expClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Calendar now = Calendar.getInstance();
@@ -124,7 +121,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             }
         };
 
-        mExpTextView.setOnClickListener(mExpClickListener);
+        mExpTextView.setOnClickListener(expClickListener);
 
         mPhotoButton = (Button) findViewById(R.id.action_add_photo);
         mPhotoButton.setOnClickListener(new View.OnClickListener() {
@@ -241,7 +238,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             String photoPath = data.getString(data.getColumnIndex(FoodContract.FoodEntry.COLUMN_PHOTO));
             if (!TextUtils.isEmpty(photoPath)) {
                 setPhotoView(photoPath);
-                mPhotoButton.setText("Change photo");
+                mPhotoButton.setText(R.string.button_photo_change);
             }
         }
     }
@@ -275,7 +272,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == IMAGE_REQUEST_CODE && resultCode == RESULT_OK) {
             setPhotoView(mPhotoPath);
-            mPhotoButton.setText("Change photo");
+            mPhotoButton.setText(R.string.button_photo_change);
         }
     }
 
@@ -358,6 +355,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         while (cursor.moveToNext()) {
             unitArray.add(cursor.getString(cursor.getColumnIndex(UnitContract.UnitEntry.COLUMN_NAME)));
         }
+        cursor.close();
+        db.close();
         Log.d(LOG_TAG, "First three units: " + unitArray.get(0) + ", " + unitArray.get(1) + ", " + unitArray.get(2));
 
         // create array adapter for spinner

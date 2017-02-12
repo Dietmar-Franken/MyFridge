@@ -28,4 +28,5 @@
     <string name="action_use_food_button">Use food</string>
     <string name="action_use_food_cancel">Cancel</string>
     <string name="alert_not_enough_food">You cannot use more food than you have!</string>
+    <string name="button_photo_change">Change photo</string>
 </resources>
